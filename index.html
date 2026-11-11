@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notepad | Login</title>
+
+    <script>
+        (function () {
+            var d = document.documentElement, t = "light";
+            try { t = localStorage.getItem("notepad_theme") === "dark" ? "dark" : "light"; } catch (e) {}
+            d.setAttribute("data-theme", t);
+            var ready = function () { d.classList.add("icons-ready"); };
+            window.addEventListener("load", function () {
+                (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(ready, ready);
+            });
+            setTimeout(ready, 2500);
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&display=swap">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="login-container">
+        <header class="header">
+            <span class="brand-mark"><span class="material-symbols-rounded">edit_note</span></span>
+            <div class="header-copy">
+                <h1>Notepad</h1>
+                <p>Sign in to your workspace</p>
+            </div>
+            <button id="themeToggle" class="theme-btn" type="button"
+                title="Switch to dark mode" aria-label="Toggle dark mode">
+                <span class="material-symbols-rounded" id="themeIcon" aria-hidden="true">dark_mode</span>
+            </button>
+        </header>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="oracleId">Oracle ID</label>
+                <input type="text" id="oracleId" placeholder="Enter Oracle ID" autocomplete="off" required>
+            </div>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" placeholder="Enter your name" autocomplete="name" required>
+            </div>
+            <div class="form-group">
+                <label for="repId">Rep ID</label>
+                <input type="text" id="repId" placeholder="Enter Rep ID" autocomplete="off" required>
+            </div>
+            <button type="submit" class="launch-btn">
+                <span class="material-symbols-rounded" aria-hidden="true">rocket_launch</span>
+                <span>Launch Notepad</span>
+            </button>
+        </form>
+
+        <p class="privacy-note">
+            <span class="material-symbols-rounded" aria-hidden="true">lock</span>
+            <span>This is not a secure sign-in. Your notes are saved only in this browser, so avoid storing sensitive customer data.</span>
+        </p>
+
+        <div class="actions">
+            <button id="clearCredentials" type="button">
+                <span class="material-symbols-rounded" aria-hidden="true">delete</span>
+                Clear saved credentials
+            </button>
+        </div>
+
+        <footer>© 2026 Notepad</footer>
+    </main>
+    <script src="dialog.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

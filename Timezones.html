@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NIST — Official U.S. Time</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+<style>
+:root{
+ --navy:#101820;--ink:#1e2933;--muted:#64717c;--paper:#f4f5f1;--line:#cbd2d2;
+ --ak:#287da6;--aleutian:#8a77a9;--hawaii:#a75d91;--samoa:#6e789f;--chamorro:#b17b55;
+ --pacific:#d8753e;--mountain:#36a467;--central:#e0bd27;--eastern:#c83d60;--inactive:#cbd1d2;
+}
+*{box-sizing:border-box}
+body,button,input,select,textarea,svg,text{font-family:'Segoe UI Variable Text','Segoe UI',system-ui,-apple-system,Roboto,sans-serif}
+body{margin:0;background:#dfe3e2;color:var(--ink);font-family:'Segoe UI Variable Text','Segoe UI',system-ui,-apple-system,Roboto,sans-serif}
+.page{max-width:1600px;margin:0 auto;background:var(--paper);min-height:100vh;border-left:1px solid #aeb7b7;border-right:1px solid #aeb7b7}
+.masthead{height:104px;background:#080d13;color:#fff;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 4.2%;border-bottom:5px solid #7f898b;gap:18px}
+.institute{display:flex;align-items:center;gap:10px;min-width:0}
+.nist-word{font-size:43px;font-weight:500;letter-spacing:-3px;line-height:1}
+.institute-copy{font-size:10px;line-height:1.15;font-weight:bold;max-width:170px}
+.main-title{font-size:clamp(27px,3.6vw,48px);font-weight:400;letter-spacing:1.4px;white-space:nowrap;text-align:center}
+.navy-lab{justify-self:end;display:flex;align-items:center;gap:10px;font-size:11px;line-height:1.25;font-weight:bold}
+.seal{width:43px;height:43px;border-radius:50%;border:2px solid #b5a45b;background:radial-gradient(circle,#264b79 0 45%,#d6c37c 47% 53%,#183a65 55%);display:grid;place-items:center;color:#fff;font-size:16px}
+.dashboard{display:grid;grid-template-columns:210px minmax(0,1fr) 210px;gap:14px;padding:16px 18px 12px;align-items:start}
+.left-rail,.right-rail{min-width:0;padding-top:0}
+.side-clock{margin-bottom:16px}.side-clock:last-child{margin-bottom:0}
+.side-heading{font-size:14px;font-weight:800;line-height:1.15;letter-spacing:.35px;text-transform:uppercase;margin:0 0 3px}
+.side-offset{font-size:11px;margin-bottom:5px;color:#4e5b64}
+.digital{background:#080d12;color:#fff;border:2px solid #a9b1b1;box-shadow:inset 0 0 0 1px #323a3e;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.2px;padding:6px 8px;font-size:clamp(18px,1.7vw,25px);line-height:1.2;white-space:nowrap;text-align:center}
+.left-rail .side-clock:nth-child(1) .side-heading{color:#235e80}
+.left-rail .side-clock:nth-child(2) .side-heading{color:#77628c}
+.left-rail .side-clock:nth-child(3) .side-heading{color:#92527f}
+.left-rail .side-clock:nth-child(4) .side-heading{color:#59688d}
+.left-rail .side-clock:nth-child(5) .side-heading{color:#80603f}
+.center{min-width:0}
+.zone-heads{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:0 0 8px;align-items:end}
+.zone-head{min-width:0}
+.zone-head .zone-name{font-size:12px;font-weight:800;line-height:1.15;letter-spacing:.25px;text-transform:uppercase;min-height:28px;display:flex;align-items:flex-end}
+.zone-head .zone-offset{font-size:11px;color:#4e5b64;margin:2px 0 5px}
+.zone-head .digital{font-size:clamp(16px,1.65vw,24px);padding:5px 3px}
+.zone-head.pacific .zone-name{color:#a4512e}.zone-head.mountain .zone-name{color:#347e54}
+.zone-head.central .zone-name{color:#987f16}.zone-head.eastern .zone-name{color:#9c344e}
+.zone-head.alaska .zone-name{color:#235e80}
+.map-shell{position:relative;width:100%;margin:4px auto 0;max-width:100%;}
+#map{width:100%;height:auto;display:block;overflow:visible}
+.state,.county-ov{stroke:none;cursor:pointer;transition:fill .35s}
+.state-borders{fill:none;stroke:#fff;stroke-width:1.3;stroke-linejoin:round;pointer-events:none}
+#hoverOutline{fill:none;stroke:#17232a99;stroke-width:1.8;stroke-linejoin:round;pointer-events:none}
+#selOutline{fill:none;stroke:#17232a;stroke-width:2.4;stroke-linejoin:round;pointer-events:none}
+.state-label{font-size:10px;font-weight:800;text-anchor:middle;fill:#17232a;pointer-events:none;paint-order:stroke;stroke:#ffffff9c;stroke-width:2.6px;stroke-linejoin:round}
+.map-status{min-height:20px;font-size:12px;line-height:1.4;color:#4c5962;padding:2px 2px 0}
+.searchbox{display:flex;align-items:stretch;gap:8px;margin:8px 0 4px}
+.searchbox input{min-width:0;flex:1;height:40px;border:1px solid #aeb8b8;border-radius:2px;padding:0 12px;background:#fff;font-size:13px}
+.searchbox button,.convert button{border:0;border-radius:2px;background:#263b49;color:#fff;font-weight:bold;padding:8px 12px;cursor:pointer}
+.right-rail{padding-left:2px}
+.utc-box{border:1px solid #858e90;text-align:center;padding:8px 6px;margin:0 0 10px;background:#f8f8f4}
+.utc-box .label{font-size:12px;font-weight:bold;line-height:1.15}
+.utc-box .utc-time{font-size:27px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:3px}
+.utc-note{text-align:center;font-size:10px;font-style:italic;font-weight:bold;line-height:1.2;margin:8px 0 16px}
+.device-box{background:#080d12;color:#fff;text-align:center;padding:14px 10px 14px;margin-bottom:16px}
+.device-box .device-title{font-size:14px;margin:2px 0 8px}
+.device-box .device-date{font-size:14px;margin:0 0 9px}
+.analog{width:min(145px,90%);aspect-ratio:1;border-radius:50%;margin:0 auto 8px;background:#f4f3e9;border:5px solid #9ca5a4;position:relative;color:#222;box-shadow:inset 0 0 0 2px #555}
+.analog .num{position:absolute;font-size:12px;font-weight:bold;line-height:1;transform:translate(-50%,-50%);z-index:1;color:#1b2227}
+.hand{position:absolute;left:50%;bottom:50%;transform-origin:50% 100%;background:#171b1d;border-radius:4px;z-index:2}
+.hour-hand{width:4px;height:29%;}.minute-hand{width:3px;height:39%}.second-hand{width:1px;height:43%;background:#9a3535}
+.pin{position:absolute;width:8px;height:8px;background:#111;border-radius:50%;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3}
+.device-time{font-size:24px;font-weight:bold;font-variant-numeric:tabular-nums}
+.drift{font-size:13px;margin-top:8px}
+.atlantic .side-heading{color:#78618c}
+.converter{margin:0 18px 18px;border:1px solid #858e90;background:#f8f8f4;padding:16px 18px 18px;border-radius:0}
+.converter h2{font-size:14px;font-weight:800;margin:0 0 3px;letter-spacing:.35px;text-transform:uppercase;color:var(--navy)}
+.converter p{font-size:11px;color:#4e5b64;margin:0 0 14px;line-height:1.4}
+.convert{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) minmax(0,1.1fr) 170px minmax(0,1.4fr);gap:12px;align-items:end}
+.field{min-width:0}
+.field label{display:block;font-size:11px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:#4c5962;margin-bottom:5px;line-height:1.1}
+.field select,.field input,.convert button,.result-box{height:42px;width:100%;min-width:0;border-radius:2px;font-family:'Segoe UI Variable Text','Segoe UI',system-ui,-apple-system,Roboto,sans-serif;font-size:13px}
+.field select,.field input{padding:0 10px;border:1px solid #aeb8b8;background:#fff;color:var(--ink);outline:none}
+.field select{appearance:none;-webkit-appearance:none;padding-right:32px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23263b49' stroke-width='1.6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;cursor:pointer}
+.field input[type=date],.field input[type=time]{appearance:none;-webkit-appearance:none;display:block;line-height:40px}
+.field select:focus,.field input:focus{border-color:#263b49;box-shadow:0 0 0 2px #263b4933}
+.convert button{border:0;background:#263b49;color:#fff;font-weight:bold;font-size:13px;padding:0 12px;cursor:pointer}
+.convert button:hover{background:#1b2c37}
+.result-box{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 10px;border:2px solid #a9b1b1;background:#080d12;color:#fff;box-shadow:inset 0 0 0 1px #323a3e}
+.result-box strong{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.result-box span{font-size:11px;color:#c7cfd2;white-space:nowrap;font-variant-numeric:tabular-nums}
+.searchbox button{height:40px;border:0;border-radius:2px;background:#263b49;color:#fff;font-weight:bold;font-size:13px;padding:0 20px;cursor:pointer;flex:none}
+/* badges + tooltip */
+.badge{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:5px;font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;padding:3px 6px;border-radius:999px;background:#e5e9e8;color:#6b7780}
+.badge::before{content:"";width:7px;height:7px;border-radius:50%;background:#9aa5a9}
+.badge.on{background:#dff3e6;color:#1d7a43}.badge.on::before{background:#2bb35e;box-shadow:0 0 0 3px #2bb35e30}
+.map-tip{position:absolute;z-index:20;pointer-events:none;min-width:190px;background:#0d141b;color:#fff;border-radius:8px;padding:10px 12px;box-shadow:0 10px 28px -6px #000a;opacity:0;transform:translateY(4px);transition:opacity .12s,transform .12s;border:1px solid #ffffff1f}
+.map-tip.show{opacity:1;transform:none}
+.map-tip .t-name{font-size:13px;font-weight:800;letter-spacing:.3px}
+.map-tip .t-zone{font-size:10.5px;color:#aab6bd;margin:1px 0 7px}
+.map-tip .t-time{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.map-tip .t-date{font-size:10.5px;color:#aab6bd;margin:2px 0 8px}
+.map-tip .badge{display:inline-flex;margin-top:0}
+.map-tip .badge:not(.on){background:#2a343b;color:#aab6bd}
+.timesel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.timesel select{padding:0 20px 0 9px;background-position:right 7px center}
+.footer{text-align:center;font-size:10px;line-height:1.6;color:#758087;padding:0 12px 14px}.footer strong{color:#4c5962;font-size:11px}
+@media(max-width:1000px){.convert{grid-template-columns:repeat(3,minmax(0,1fr))}.convert .field:first-child{grid-column:1/-1}.convert .result-field{grid-column:span 2}.convert button{grid-column:span 1}.dashboard{grid-template-columns:170px minmax(0,1fr) 180px;gap:8px;padding:10px}.masthead{padding:0 2%}.institute-copy{display:none}.nist-word{font-size:34px}.navy-lab{font-size:9px}.side-heading{font-size:11px}.digital{font-size:17px}.zone-head .zone-name{font-size:10px}.zone-head .digital{font-size:15px}}
+@media(max-width:700px){.masthead{height:auto;min-height:78px;grid-template-columns:1fr auto;padding:12px}.institute{display:none}.main-title{font-size:clamp(20px,5vw,30px);text-align:left}.navy-lab{font-size:8px}.seal{width:32px;height:32px}.dashboard{grid-template-columns:1fr;gap:8px}.center{grid-row:1}.left-rail{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.left-rail .side-clock{margin:0}.map-shell{margin-top:8px}.right-rail{display:grid;grid-template-columns:1fr 1fr;gap:8px}.utc-box{margin:0;align-self:start}.utc-note{grid-column:1/-1;margin:0}.device-box{margin:0}.right-rail .side-clock{grid-column:1/-1}.convert{grid-template-columns:1fr 1fr}.convert .field:first-child{grid-column:1/-1}.convert .result-field{grid-column:1/-1}.convert button{grid-column:1/-1}.converter{margin:0 10px 12px}.dashboard{padding:10px}}
+
+/* ===== Premium theme ===== */
+:root{--gold:#b79f55;--card:#fff;--card-b:#d9dfdf;--shadow:0 1px 2px rgba(16,24,32,.06),0 10px 24px -14px rgba(16,24,32,.3)}
+@keyframes pageIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.page{animation:pageIn .6s ease both;background:linear-gradient(180deg,#f7f8f5,#edf0ee)}
+.masthead{background:repeating-linear-gradient(45deg,#ffffff07 0 1px,transparent 1px 8px),linear-gradient(135deg,#05080c,#122030 55%,#070c12);border-bottom:3px solid var(--gold);box-shadow:0 6px 18px -8px #0008}
+.main-title{font-weight:400;letter-spacing:4px;font-size:clamp(24px,3.2vw,42px)}
+.seal{box-shadow:0 0 0 3px #b79f5533}
+.digital{background:linear-gradient(180deg,#1a242d 0%,#0a1117 55%,#05090d 100%);border:1px solid #3a464e;border-radius:8px;box-shadow:inset 0 1px 0 #ffffff26,inset 0 -8px 14px #0006,0 6px 14px -8px #000a;letter-spacing:.5px;text-shadow:0 0 10px #8fb7d033}
+.digital .sec,.utc-time .sec,.device-time .sec{opacity:.5}
+.utc-box{background:var(--card);border:1px solid var(--card-b);border-radius:10px;box-shadow:var(--shadow);padding:12px 8px}
+.utc-box .utc-time{letter-spacing:1px;font-size:28px}
+.device-box{border-radius:12px;background:linear-gradient(180deg,#141e27,#070b10);border:1px solid #2a353d;box-shadow:var(--shadow)}
+.converter{border-radius:12px;border:1px solid var(--card-b);background:var(--card);box-shadow:var(--shadow)}
+.field select,.field input,.searchbox input,.searchbox button,.convert button,.result-box{border-radius:8px}
+.searchbox button,.convert button{background:linear-gradient(180deg,#34505f,#1f3340);color:#fff;box-shadow:0 4px 10px -5px #1f3340aa}
+.searchbox button:hover,.convert button:hover{filter:brightness(1.12)}
+.result-box{background:linear-gradient(180deg,#1a242d,#05090d);border:1px solid #3a464e;box-shadow:inset 0 1px 0 #ffffff26}
+.side-heading,.zone-head .zone-name{letter-spacing:.7px}
+.side-offset,.zone-head .zone-offset{font-size:10.5px;letter-spacing:.3px;color:#6a767e}
+.left-rail .side-clock:nth-child(n) .side-heading,.right-rail .atlantic .side-heading{color:#263b49}
+.zone-head.pacific .zone-name{color:#a65a33}.zone-head.mountain .zone-name,.zone-head.arizona .zone-name{color:#2f7a55}
+.zone-head.central .zone-name{color:#8d7220}.zone-head.eastern .zone-name{color:#9c3f58}.zone-head.alaska .zone-name{color:#2d6a8c}
+#map{filter:drop-shadow(0 10px 14px rgba(16,24,32,.16))}
+.state:hover,.county-ov:hover{filter:brightness(1.07)}
+.state-borders{stroke:#fff;stroke-width:1.1}
+.state-label{font-size:9px;font-weight:700;stroke:#ffffffb0;stroke-width:2.2px;opacity:.85;transition:opacity .15s}
+.state-label.small{opacity:0}.state-label.small.show{opacity:1}
+.legend{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px 16px;margin:12px 0 2px;padding:10px 14px;background:var(--card);border:1px solid var(--card-b);border-radius:10px;box-shadow:var(--shadow);font-size:11px;font-weight:700;letter-spacing:.4px;color:#41505a}
+.legend span{display:inline-flex;align-items:center;white-space:nowrap}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px}
+.legend .sep{width:1px;height:16px;background:#cfd6d6}
+.analog{background:radial-gradient(circle at 35% 30%,#fffef8,#ebeadd 70%);border:6px solid #c4cacb;box-shadow:0 0 0 1px #6c777c,0 4px 12px -2px #0008,inset 0 3px 8px #0003}
+.tick{position:absolute;left:50%;top:0;width:2px;height:50%;transform-origin:50% 100%;pointer-events:none}
+.tick::before{content:"";display:block;margin:0 auto;width:1px;height:4px;background:#8a949a}
+.tick.h::before{width:2px;height:7px;background:#2a343b}
+.hand.second-hand{width:2px;height:44%;background:#c0392b;border-radius:2px;transition:none;will-change:transform}
+.second-hand::after{content:"";position:absolute;left:0;top:100%;width:100%;height:14%;background:#c0392b;border-radius:0 0 2px 2px}
+.footer{border-top:1px solid #d3d9d9;margin:6px 18px 0;padding:14px 12px 18px}
+
+/* unified clock size: side + horizontal time zones */
+.side-clock .digital,.atlantic .digital,.zone-head .digital{font-size:clamp(16px,1.65vw,24px);padding:6px 4px;line-height:1.2;letter-spacing:.5px;border-radius:8px}
+.side-heading,.zone-head .zone-name{font-size:12px;line-height:1.15;letter-spacing:.7px}
+.side-offset,.zone-head .zone-offset{font-size:10.5px;margin:2px 0 5px}
+@media(max-width:1000px){.side-clock .digital,.atlantic .digital,.zone-head .digital{font-size:15px}.side-heading,.zone-head .zone-name{font-size:10px}}
+@media(max-width:700px){.side-clock .digital,.atlantic .digital,.zone-head .digital{font-size:18px}.side-heading,.zone-head .zone-name{font-size:11px}}
+
+.dashboard .side-clock.pacific .side-heading{color:#a65a33}.dashboard .side-clock.mountain .side-heading,.dashboard .side-clock.arizona .side-heading{color:#2f7a55}
+.dashboard .side-clock.central .side-heading{color:#8d7220}.dashboard .side-clock.eastern .side-heading{color:#9c3f58}
+.dashboard .side-clock.alaska .side-heading{color:#2d6a8c}.dashboard .side-clock.hawaii .side-heading{color:#7d5a8c}
+</style>
+</head>
+<body>
+<div class="page">
+<header class="masthead">
+ <div class="institute"><div class="nist-word">NIST</div><div class="institute-copy">NATIONAL INSTITUTE OF<br>STANDARDS AND TECHNOLOGY<br>U.S. DEPARTMENT OF COMMERCE</div></div>
+ <div class="main-title">OFFICIAL U.S. TIME</div>
+ <div class="navy-lab"><div class="seal">✦</div><div>United States<br>Naval Observatory<br>U.S. Department of Defense</div></div>
+</header>
+
+<div class="dashboard">
+ <aside class="left-rail">
+  <div class="side-clock pacific"><div class="side-heading">Pacific Standard Time</div><div class="side-offset">PST (UTC−8)</div><div class="digital" id="clock-pacific">--:--:--</div></div>
+  <div class="side-clock mountain"><div class="side-heading">Mountain Standard Time</div><div class="side-offset">MST (UTC−7)</div><div class="digital" id="clock-mountain">--:--:--</div></div>
+  <div class="side-clock arizona"><div class="side-heading">Arizona Mountain Standard Time</div><div class="side-offset">MST (UTC−7) · no daylight saving</div><div class="digital" id="clock-arizona">--:--:--</div></div>
+  <div class="side-clock central"><div class="side-heading">Central Standard Time</div><div class="side-offset">CST (UTC−6)</div><div class="digital" id="clock-central">--:--:--</div></div>
+  <div class="side-clock eastern"><div class="side-heading">Eastern Standard Time</div><div class="side-offset">EST (UTC−5)</div><div class="digital" id="clock-eastern">--:--:--</div></div>
+ </aside>
+
+ <main class="center">
+  <div class="searchbox"><input id="search" type="search" placeholder="Offline search: state, city, or ZIP code…" autocomplete="off"><button id="searchBtn">Search</button></div>
+  <div class="map-status" id="status">Search a state, city, or ZIP code to highlight it on the map.</div>
+  <div class="map-shell"><svg id="map" viewBox="0 0 960 610" role="img" aria-label="United States map with states colored by time zone"></svg><div class="map-tip" id="mapTip"></div></div>
+  <div class="legend" id="legend"></div>
+ </main>
+
+ <aside class="right-rail">
+  <div class="utc-box"><div class="label">Coordinated Universal<br>Time (UTC)</div><div class="utc-time" id="utc">--:--:--</div></div>
+  <div class="utc-note">UTC IS ALWAYS DISPLAYED AS<br>A 24-HOUR CLOCK</div>
+  <div class="side-clock alaska"><div class="side-heading">Alaska Standard Time</div><div class="side-offset">AKST (UTC−9)</div><div class="digital" id="clock-alaska">--:--:--</div></div>
+  <div class="side-clock hawaii"><div class="side-heading">Hawaii Standard Time</div><div class="side-offset">HST (UTC−10)</div><div class="digital" id="clock-hawaii">--:--:--</div></div>
+  <div class="device-box">
+   <div class="device-title">Your Device's Clock</div><div class="device-date" id="deviceDate">Today: --/--/----</div>
+   <div class="analog" id="analog">
+    <span class="hand hour-hand" id="hourHand"></span><span class="hand minute-hand" id="minuteHand"></span><span class="hand second-hand" id="secondHand"></span><span class="pin"></span>
+   </div>
+   <div class="device-time" id="deviceTime">--:--:--</div><div class="drift">Your clock is running in your device's local time.</div>
+  </div>
+  
+ </aside>
+</div>
+
+<section class="converter">
+ <h2>Time Conversion to Pacific Time</h2>
+ <p>Choose a source time zone, date and time. The conversion automatically accounts for PST/PDT daylight-saving rules.</p>
+ <div class="convert">
+  <div class="field"><label for="sourceZone">Convert from time zone</label><select id="sourceZone">
+   <option value="America/New_York">Eastern Time (US)</option><option value="America/Chicago">Central Time (US)</option><option value="America/Denver">Mountain Time (US)</option><option value="America/Phoenix">Arizona (MST)</option><option value="America/Los_Angeles">Pacific Time (US)</option><option value="America/Anchorage">Alaska Time</option><option value="Pacific/Honolulu">Hawaii Time</option><option value="Pacific/Guam">Chamorro Time (Guam)</option><option value="Pacific/Pago_Pago">Samoa Time</option><option value="America/Puerto_Rico">Atlantic Time (Puerto Rico)</option><option value="Asia/Manila">Philippine Time</option><option value="UTC">UTC</option><option value="Europe/London">London</option><option value="Asia/Tokyo">Japan</option><option value="Australia/Sydney">Sydney</option>
+  </select></div>
+  <div class="field"><label for="sourceDate">Date</label><input type="date" id="sourceDate"></div>
+  <div class="field"><label for="tHour">Time</label><div class="timesel" id="timesel"><select id="tHour" aria-label="Hour"></select><select id="tMin" aria-label="Minute"></select><select id="tAmPm" aria-label="AM or PM"><option>AM</option><option>PM</option></select></div><input type="hidden" id="sourceTime" value="09:00"></div>
+  <button id="convertBtn">Convert to PST</button>
+  <div class="field result-field"><label>Converted Pacific time</label><div class="result-box"><strong id="result">Select date and time</strong><span id="resultDate">PST / PDT</span></div></div>
+ </div>
+</section>
+<div class="footer">Search works offline using the built-in U.S. state, city and ZIP-prefix directory. The map boundary file is loaded from the online map library.<br><strong>Made by: Warren Carl</strong></div>
+</div>
+<script>
+const tz={
+ alaska:"America/Anchorage",aleutian:"America/Adak",hawaii:"Pacific/Honolulu",samoa:"Pacific/Pago_Pago",chamorro:"Pacific/Guam",
+ pacific:"America/Los_Angeles",mountain:"America/Denver",central:"America/Chicago",eastern:"America/New_York",arizona:"America/Phoenix",atlantic:"America/Puerto_Rico"
+};
+const stateNames={"01":"Alabama","02":"Alaska","04":"Arizona","05":"Arkansas","06":"California","08":"Colorado","09":"Connecticut","10":"Delaware","11":"District of Columbia","12":"Florida","13":"Georgia","15":"Hawaii","16":"Idaho","17":"Illinois","18":"Indiana","19":"Iowa","20":"Kansas","21":"Kentucky","22":"Louisiana","23":"Maine","24":"Maryland","25":"Massachusetts","26":"Michigan","27":"Minnesota","28":"Mississippi","29":"Missouri","30":"Montana","31":"Nebraska","32":"Nevada","33":"New Hampshire","34":"New Jersey","35":"New Mexico","36":"New York","37":"North Carolina","38":"North Dakota","39":"Ohio","40":"Oklahoma","41":"Oregon","42":"Pennsylvania","44":"Rhode Island","45":"South Carolina","46":"South Dakota","47":"Tennessee","48":"Texas","49":"Utah","50":"Vermont","51":"Virginia","53":"Washington","54":"West Virginia","55":"Wisconsin","56":"Wyoming"};
+const abbr={"AL":"01","AK":"02","AZ":"04","AR":"05","CA":"06","CO":"08","CT":"09","DE":"10","DC":"11","FL":"12","GA":"13","HI":"15","ID":"16","IL":"17","IN":"18","IA":"19","KS":"20","KY":"21","LA":"22","ME":"23","MD":"24","MA":"25","MI":"26","MN":"27","MS":"28","MO":"29","MT":"30","NE":"31","NV":"32","NH":"33","NJ":"34","NM":"35","NY":"36","NC":"37","ND":"38","OH":"39","OK":"40","OR":"41","PA":"42","RI":"44","SC":"45","SD":"46","TN":"47","TX":"48","UT":"49","VT":"50","VA":"51","WA":"53","WV":"54","WI":"55","WY":"56"};
+// Predominant civil time zone by state. A few split-zone states are assigned by their largest population area.
+const stateZone={"01":"central","02":"alaska","04":"arizona","05":"central","06":"pacific","08":"mountain","09":"eastern","10":"eastern","11":"eastern","12":"eastern","13":"eastern","15":"hawaii","16":"mountain","17":"central","18":"eastern","19":"central","20":"central","21":"eastern","22":"central","23":"eastern","24":"eastern","25":"eastern","26":"eastern","27":"central","28":"central","29":"central","30":"mountain","31":"central","32":"pacific","33":"eastern","34":"eastern","35":"mountain","36":"eastern","37":"eastern","38":"central","39":"eastern","40":"central","41":"pacific","42":"eastern","44":"eastern","45":"eastern","46":"central","47":"central","48":"central","49":"mountain","50":"eastern","51":"eastern","53":"pacific","54":"eastern","55":"central","56":"mountain"};
+const palette={pacific:"#e08a5b",mountain:"#5fae86",central:"#e6c56a",eastern:"#c8677f",alaska:"#5b94b5",arizona:"#5fae86",hawaii:"#a37bb0"};
+const inactiveColor=()=>"#d5dadb";
+function setClock(el,t){const m=t.match(/^(\d{1,2}:\d{2})(:\d{2})(.*)$/);el.innerHTML=m?`${m[1]}<span class="sec">${m[2]}</span>${m[3]}`:t}
+const clockFormat=(date,zone,h12=true)=>new Intl.DateTimeFormat("en-US",{timeZone:zone,hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:h12?"h12":"h23"}).format(date);
+function localHour(date,zone){return Number(new Intl.DateTimeFormat("en-US",{timeZone:zone,hour:"numeric",hourCycle:"h23"}).format(date))}
+function active(date,zone){const h=localHour(date,zone);return h>=8&&h<21}
+function zoneFor(fips){return stateZone[fips]||"central"}
+function fillFor(fips,now){const z=zoneFor(fips);return active(now,tz[z])?(palette[z]||"#8e78b8"):inactiveColor()}
+const zoneLabels={pacific:"Pacific",mountain:"Mountain",central:"Central",eastern:"Eastern",arizona:"Arizona (Mountain)",alaska:"Alaska",hawaii:"Hawaii"};
+let hoverInfo=null,hoverPos=[0,0];
+function dateFmt(date,zone){return new Intl.DateTimeFormat("en-US",{timeZone:zone,weekday:"short",month:"short",day:"numeric"}).format(date)}
+function renderTip(now){
+ const tip=document.getElementById("mapTip");
+ if(!hoverInfo){tip.classList.remove("show");return}
+ const z=hoverInfo.zone,zone=tz[z],on=active(now,zone);
+ const abb=new Intl.DateTimeFormat("en-US",{timeZone:zone,timeZoneName:"short"}).formatToParts(now).find(p=>p.type==="timeZoneName")?.value||"";
+ tip.innerHTML=`<div class="t-name">${stateNames[hoverInfo.fips]}</div><div class="t-zone">${zoneLabels[z]||z} · ${abb}</div><div class="t-time">${clockFormat(now,zone)}</div><div class="t-date">${dateFmt(now,zone)}</div><span class="badge ${on?"on":""}">${on?"Active hours":"Inactive"}</span>`;
+ const shell=tip.parentElement.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight;
+ let x=hoverPos[0]+16,y=hoverPos[1]+16;
+ if(x+w>shell.width)x=hoverPos[0]-w-12;
+ if(y+h>shell.height)y=hoverPos[1]-h-12;
+ tip.style.left=Math.max(0,x)+"px";tip.style.top=Math.max(0,y)+"px";
+ tip.classList.add("show");
+}
+function update(){
+ const now=new Date();
+ Object.entries(tz).forEach(([id,zone])=>{
+  const el=document.getElementById("clock-"+id);if(!el)return;
+  setClock(el,clockFormat(now,zone));
+ });
+ renderTip(now);
+ setClock(document.getElementById("utc"),clockFormat(now,"UTC",false));
+ setClock(document.getElementById("deviceTime"),new Intl.DateTimeFormat("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h12"}).format(now));
+ document.getElementById("deviceDate").textContent="Today: "+new Intl.DateTimeFormat("en-US",{month:"2-digit",day:"2-digit",year:"numeric"}).format(now);
+ const h=now.getHours(),m=now.getMinutes(),s=now.getSeconds();
+ document.getElementById("hourHand").style.transform=`translateX(-50%) rotate(${(h%12)*30+m*.5}deg)`;
+ document.getElementById("minuteHand").style.transform=`translateX(-50%) rotate(${m*6+s*.1}deg)`;
+  d3.selectAll(".state").attr("fill",d=>fillFor(String(d.id).padStart(2,"0"),now));
+ d3.selectAll(".county-ov").attr("fill",d=>active(now,tz[d.zone])?(palette[d.zone]||"#8e78b8"):inactiveColor());
+}
+// Counties whose time zone differs from the rest of their state (matches the reference map)
+const altZones={
+ pacific:["16009","16017","16021","16035","16049","16055","16057","16061","16069","16079"],
+ mountain:["38001","38007","38011","38025","38033","38041","38087","38089",
+  "46007","46019","46031","46033","46047","46055","46063","46071","46081","46093","46102","46113","46103","46105","46137",
+  "31007","31013","31029","31033","31045","31049","31057","31069","31105","31123","31157","31161","31165",
+  "20071","20075","20181","20199","48141","48229"]
+};
+const countyZone={};Object.entries(altZones).forEach(([z,ids])=>ids.forEach(id=>countyZone[id]=z));
+let stateFeat={},pathGen=null;
+function setOutline(id,fips){
+ const el=document.getElementById(id);if(!el||!pathGen)return;
+ el.setAttribute("d",fips&&stateFeat[fips]?pathGen(stateFeat[fips]):"");
+}
+function selectState(fips,detail=""){
+ const name=stateNames[fips];if(!name)return;
+ setOutline("selOutline",fips);
+ const z=zoneFor(fips);const label=({pacific:"Pacific",mountain:"Mountain",central:"Central",eastern:"Eastern",arizona:"Arizona Mountain",alaska:"Alaska",hawaii:"Hawaii"})[z]||z;
+ document.getElementById("status").textContent=`${name}${detail?" · "+detail:""} — ${label} time. State highlighted on map.`;
+}
+async function drawMap(){
+ const svg=d3.select("#map"),W=960,H=610;
+ try{
+  const [us,cs]=await Promise.all([d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json"),d3.json("https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json")]);
+  const features=topojson.feature(us,us.objects.states);
+  const projection=d3.geoAlbersUsa().fitExtent([[8,8],[W-8,H-8]],features);
+  const path=d3.geoPath(projection);pathGen=path;
+  features.features.forEach(f=>stateFeat[String(f.id).padStart(2,"0")]=f);
+  const smallFips=new Set(["VT","NH","MA","CT","RI","NJ","DE","MD","DC"].map(a=>abbr[a]).filter(Boolean));
+  const showTip=(e,fips,zone)=>{
+   d3.selectAll(".state-label.small").classed("show",false);if(smallFips.has(fips))d3.select(`.state-label[data-fips="${fips}"]`).classed("show",true);
+   const r=document.querySelector(".map-shell").getBoundingClientRect(),k=r.width/W;
+   hoverInfo={fips,zone};hoverPos=[e.clientX-r.left,e.clientY-r.top];
+   setOutline("hoverOutline",fips);renderTip(new Date());
+  };
+  const hideTip=()=>{d3.selectAll(".state-label.small").classed("show",false);hoverInfo=null;setOutline("hoverOutline",null);renderTip(new Date())};
+
+  // base states
+  svg.selectAll("path.state").data(features.features).join("path").attr("class","state").attr("d",path)
+   .attr("data-fips",d=>String(d.id).padStart(2,"0"))
+   .on("click",(e,d)=>selectState(String(d.id).padStart(2,"0")))
+   .on("mouseenter mousemove",(e,d)=>{const f=String(d.id).padStart(2,"0");showTip(e,f,zoneFor(f))})
+   .on("mouseleave",hideTip);
+
+  // split-zone county groups, merged per state so no inner lines show
+  const groups={};
+  cs.objects.counties.geometries.forEach(g=>{const id=String(g.id).padStart(5,"0"),z=countyZone[id];if(z)(groups[id.slice(0,2)+"|"+z]??=[]).push(g)});
+  const overlays=Object.entries(groups).map(([k,gs])=>{const [fips,zone]=k.split("|");return{fips,zone,geometry:topojson.merge(cs,gs)}});
+  svg.selectAll("path.county-ov").data(overlays).join("path").attr("class","county-ov").attr("d",d=>path(d.geometry))
+   .on("click",(e,d)=>selectState(d.fips))
+   .on("mouseenter mousemove",(e,d)=>showTip(e,d.fips,d.zone))
+   .on("mouseleave",hideTip);
+
+  // white borders on top (states + zone-split edges)
+  svg.append("path").attr("class","state-borders").attr("d",path(topojson.mesh(us,us.objects.states)));
+  svg.selectAll("path.ov-border").data(overlays).join("path").attr("class","state-borders ov-border").attr("d",d=>path(d.geometry));
+  svg.append("path").attr("id","hoverOutline");
+  svg.append("path").attr("id","selOutline");
+
+  svg.selectAll("text.state-label").data(features.features).join("text").attr("class","state-label")
+   .attr("data-fips",d=>String(d.id).padStart(2,"0")).classed("small",d=>smallFips.has(String(d.id).padStart(2,"0")))
+   .attr("transform",d=>{const c=path.centroid(d);return `translate(${c[0]},${c[1]})`})
+   .text(d=>Object.keys(abbr).find(a=>abbr[a]===String(d.id).padStart(2,"0"))||"");
+  update();
+ }catch(err){console.error(err);svg.append("text").attr("x",480).attr("y",300).attr("text-anchor","middle").text("Map could not load. Please refresh with an internet connection.")}
+}
+const cityLookup={
+ "new york":"36","new york city":"36","brooklyn":"36","buffalo":"36","albany":"36","los angeles":"06","san francisco":"06","san diego":"06","san jose":"06","sacramento":"06","fresno":"06","oakland":"06","las vegas":"32","reno":"32","henderson":"32","seattle":"53","spokane":"53","tacoma":"53","portland":"41","eugene":"41","salem":"41","phoenix":"04","tucson":"04","mesa":"04","scottsdale":"04","denver":"08","colorado springs":"08","aurora":"08","boise":"16","idaho falls":"16","salt lake city":"49","provo":"49","albuquerque":"35","santa fe":"35","billings":"30","missoula":"30","cheyenne":"56","casper":"56","honolulu":"15","anchorage":"02","fairbanks":"02","juneau":"02",
+ "chicago":"17","springfield":"17","rockford":"17","indianapolis":"18","fort wayne":"18","detroit":"26","grand rapids":"26","lansing":"26","milwaukee":"55","madison":"55","green bay":"55","minneapolis":"27","saint paul":"27","st paul":"27","duluth":"27","des moines":"19","cedar rapids":"19","omaha":"31","lincoln":"31","wichita":"20","topeka":"20","kansas city":"29","st louis":"29","saint louis":"29","columbia":"29","fargo":"38","bismarck":"38","sioux falls":"46","rapid city":"46",
+ "dallas":"48","houston":"48","austin":"48","san antonio":"48","fort worth":"48","el paso":"48","arlington":"48","corpus christi":"48","oklahoma city":"40","tulsa":"40","little rock":"05","fayetteville":"05","new orleans":"22","baton rouge":"22","shreveport":"22","jackson":"28","gulfport":"28","memphis":"47","nashville":"47","knoxville":"47","chattanooga":"47","louisville":"21","lexington":"21","bowling green":"21",
+ "atlanta":"13","savannah":"13","augusta":"13","miami":"12","orlando":"12","tampa":"12","jacksonville":"12","tallahassee":"12","fort lauderdale":"12","west palm beach":"12","charlotte":"37","raleigh":"37","durham":"37","greensboro":"37","asheville":"37","columbia":"45","charleston":"45","greenville":"45","myrtle beach":"45","richmond":"51","virginia beach":"51","norfolk":"51","arlington va":"51","roanoke":"51","washington dc":"11","baltimore":"24","annapolis":"24","wilmington":"10","philadelphia":"42","pittsburgh":"42","harrisburg":"42","erie":"42","newark":"34","jersey city":"34","trenton":"34","boston":"25","worcester":"25","springfield ma":"25","providence":"44","hartford":"09","new haven":"09","bridgeport":"09","manchester":"33","concord":"33","portland maine":"23","bangor":"23","burlington":"50","montpelier":"50","detroit mi":"26","cleveland":"39","columbus":"39","cincinnati":"39","toledo":"39","dayton":"39","charleston wv":"54","huntington":"54","morgantown":"54"
+};
+const zipPrefixRanges=[
+ [5,9,"36"],[10,27,"25"],[28,29,"44"],[30,38,"33"],[39,49,"23"],[50,59,"50"],[60,69,"09"],[70,89,"34"],[100,149,"36"],[150,196,"42"],[197,199,"10"],[200,205,"11"],[206,219,"24"],[220,246,"51"],[247,268,"54"],[270,289,"37"],[290,299,"45"],[300,319,"13"],[320,349,"12"],[350,369,"01"],[370,385,"47"],[386,397,"28"],[398,399,"13"],[400,427,"21"],[430,459,"39"],[460,479,"18"],[480,499,"26"],[500,528,"19"],[530,549,"55"],[550,567,"27"],[570,577,"46"],[580,588,"38"],[590,599,"30"],[600,629,"17"],[630,658,"29"],[660,679,"20"],[680,693,"31"],[700,714,"22"],[716,729,"05"],[730,749,"40"],[750,799,"48"],[800,816,"08"],[820,831,"56"],[832,838,"16"],[840,847,"49"],[850,865,"04"],[870,884,"35"],[889,898,"32"],[900,961,"06"],[967,968,"15"],[995,999,"02"]
+];
+function offlineZipState(zip){
+ const n=Number(zip.slice(0,3));
+ for(const [lo,hi,fips] of zipPrefixRanges)if(n>=lo&&n<=hi)return fips;
+ return null;
+}
+function search(){
+ const q=document.getElementById("search").value.trim(),status=document.getElementById("status");
+ if(!q)return;
+ const up=q.toUpperCase();
+ if(abbr[up]){selectState(abbr[up]);return}
+ const exact=Object.entries(stateNames).find(([id,n])=>n.toLowerCase()===q.toLowerCase());
+ if(exact){selectState(exact[0]);return}
+ const city=cityLookup[q.toLowerCase()];
+ if(city){selectState(city,q);return}
+ if(/^\d{5}$/.test(q)){
+  const fips=offlineZipState(q);
+  if(fips){selectState(fips,`ZIP ${q} (offline ZIP-prefix match)`);return}
+  status.textContent="ZIP code not in the built-in offline lookup. Try its city or state.";
+  return;
+ }
+ const cityMatch=Object.entries(cityLookup).find(([name])=>name.startsWith(q.toLowerCase()));
+ if(cityMatch){selectState(cityMatch[1],cityMatch[0]);return}
+ status.textContent="No offline match found. Try a state name/abbreviation, a major U.S. city, or a 5-digit ZIP code.";
+}
+document.getElementById("searchBtn").addEventListener("click",search);
+document.getElementById("search").addEventListener("keydown",e=>{if(e.key==="Enter")search()});
+function getParts(date,zone){
+ const f=new Intl.DateTimeFormat("en-CA",{timeZone:zone,year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"});
+ return Object.fromEntries(f.formatToParts(date).map(p=>[p.type,p.value]));
+}
+function makeInstant(y,m,d,h,min,zone){
+ const target=Date.UTC(y,m-1,d,h,min),guess=new Date(target);
+ for(let i=0;i<5;i++){const p=getParts(guess,zone),represented=Date.UTC(+p.year,+p.month-1,+p.day,+p.hour,+p.minute);guess.setTime(guess.getTime()+target-represented)}
+ return guess;
+}
+function convert(){
+ const date=document.getElementById("sourceDate").value,time=document.getElementById("sourceTime").value,zone=document.getElementById("sourceZone").value;
+ if(!date||!time)return;
+ const [y,m,d]=date.split("-").map(Number),[h,min]=time.split(":").map(Number);
+ const instant=makeInstant(y,m,d,h,min,zone);
+ const result=clockFormat(instant,"America/Los_Angeles");
+ const parts=getParts(instant,"America/Los_Angeles");
+ const abbreviation=new Intl.DateTimeFormat("en-US",{timeZone:"America/Los_Angeles",timeZoneName:"short"}).formatToParts(instant).find(p=>p.type==="timeZoneName")?.value||"Pacific";
+ document.getElementById("result").textContent=result;
+ document.getElementById("resultDate").textContent=`${abbreviation} · ${parts.month}/${parts.day}/${parts.year}`;
+}
+// legend
+(function(){const names=[["pacific","Pacific"],["mountain","Mountain"],["central","Central"],["eastern","Eastern"],["alaska","Alaska"],["hawaii","Hawaii"]];
+ document.getElementById("legend").innerHTML=names.map(([k,n])=>`<span><i style="background:${palette[k]}"></i>${n}</span>`).join("")+'<span class="sep"></span><span><i style="background:#d5dadb"></i>Inactive (outside 8 AM–9 PM)</span>';})();
+// analog clock ticks + numbers
+(function(){const a=document.getElementById("analog");
+ for(let i=0;i<60;i++){const t=document.createElement("span");t.className="tick"+(i%5===0?" h":"");t.style.transform=`translateX(-50%) rotate(${i*6}deg)`;a.insertBefore(t,a.firstChild)}
+})();
+// analog clock numbers
+(function(){const a=document.getElementById("analog");
+ for(let n=1;n<=12;n++){const r=Math.PI*n/6,e=document.createElement("span");e.className="num";e.textContent=n;
+  e.style.left=(50+37*Math.sin(r))+"%";e.style.top=(50-37*Math.cos(r))+"%";a.insertBefore(e,a.firstChild)}})();
+// time selectors (12h / 24h)
+const tHour=document.getElementById("tHour"),tMin=document.getElementById("tMin"),tAmPm=document.getElementById("tAmPm"),srcTime=document.getElementById("sourceTime");
+const pad2=n=>String(n).padStart(2,"0");
+tMin.innerHTML=Array.from({length:60},(_,i)=>`<option value="${i}">${pad2(i)}</option>`).join("");
+function buildHours(h24){
+ tHour.innerHTML=Array.from({length:12},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join("");
+ tHour.value=(h24%12)||12;tAmPm.value=h24>=12?"PM":"AM";
+}
+function syncTime(){
+ const h=(+tHour.value%12)+(tAmPm.value==="PM"?12:0);
+ srcTime.value=`${pad2(h)}:${pad2(+tMin.value)}`;
+}
+buildHours(9);tMin.value=0;syncTime();
+[tHour,tMin,tAmPm].forEach(el=>el.addEventListener("change",()=>{syncTime();convert()}));
+const now=new Date();
+const localISO=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,10);
+document.getElementById("sourceDate").value=localISO;
+document.getElementById("convertBtn").addEventListener("click",convert);
+["sourceDate","sourceZone"].forEach(id=>document.getElementById(id).addEventListener("change",convert));
+drawMap();update();convert();setInterval(update,1000);
+// smooth, drift-free second hand (follows device clock to the millisecond)
+(function sweep(){
+ const n=new Date(),sec=n.getSeconds()+n.getMilliseconds()/1000;
+ document.getElementById("secondHand").style.transform=`translateX(-50%) rotate(${sec*6}deg)`;
+ requestAnimationFrame(sweep);
+})();
+</script>
+</body>
+</html>

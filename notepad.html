@@ -1,0 +1,556 @@
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notepad</title>
+
+    <link rel="stylesheet" href="notepad.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0" rel="stylesheet">
+
+    <script>
+        (function () {
+            var d = document.documentElement, t = "light";
+            try { t = localStorage.getItem("notepad_theme") === "dark" ? "dark" : "light"; } catch (e) {}
+            d.setAttribute("data-theme", t);
+            var ready = function () { d.classList.add("icons-ready"); };
+            window.addEventListener("load", function () {
+                (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(ready, ready);
+            });
+            setTimeout(ready, 2500);
+        })();
+    </script>
+</head>
+
+<body>
+    <div class="workspace">
+
+        <!-- HEADER -->
+        <header class="workspace-header">
+
+            <div class="header-identity">
+                <div class="brand">
+                    <span class="brand-mark"><span class="material-symbols-rounded" aria-hidden="true">edit_note</span></span>
+                    <span class="brand-name">Notepad</span>
+                </div>
+
+                <div class="user-details">
+                    <span class="user-avatar" id="userAvatar" aria-hidden="true">U</span>
+
+                    <div class="user-item user-name">
+                        <span id="userName">User</span>
+                    </div>
+
+                    <div class="user-item" title="Oracle ID">
+                        <span class="material-symbols-rounded" aria-hidden="true">badge</span>
+                        <span id="oracleId">Oracle ID</span>
+                    </div>
+
+                    <div class="user-item" title="Rep ID">
+                        <span class="material-symbols-rounded" aria-hidden="true">id_card</span>
+                        <span id="repId">Rep ID</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="header-actions">
+
+                <div class="header-dropdowns">
+
+                    <!-- QUICK ACCESS -->
+                    <div class="quick-access">
+                        <button
+                            class="quick-access-button"
+                            id="quickAccessButton"
+                            type="button"
+                            aria-expanded="false"
+                        >
+                            <span class="material-symbols-rounded">grid_view</span>
+                            <span>Quick Access</span>
+                            <span class="material-symbols-rounded dropdown-arrow">expand_more</span>
+                        </button>
+
+                        <div class="dropdown-menu" id="quickAccessMenu" hidden>
+                            <button type="button" data-category="links">
+                                <span class="material-symbols-rounded">link</span>
+                                Links
+                            </button>
+
+                            <button type="button" data-category="contacts">
+                                <span class="material-symbols-rounded">contacts</span>
+                                Contacts
+                            </button>
+
+                            <button type="button" data-category="templates">
+                                <span class="material-symbols-rounded">description</span>
+                                Templates
+                            </button>
+
+                            <button type="button" data-category="others">
+                                <span class="material-symbols-rounded">folder_open</span>
+                                Others
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- NOTES -->
+                    <div class="quick-access">
+                        <button
+                            class="quick-access-button"
+                            id="notesButton"
+                            type="button"
+                            aria-expanded="false"
+                        >
+                            <span class="material-symbols-rounded">edit_note</span>
+                            <span>Notes</span>
+                            <span class="material-symbols-rounded dropdown-arrow">expand_more</span>
+                        </button>
+
+                        <div class="dropdown-menu" id="notesMenu" hidden>
+                            <button type="button" data-note-section="phonetime">
+                                <span class="material-symbols-rounded">call</span>
+                                Phonetime
+                            </button>
+
+                            <button type="button" data-note-section="casework">
+                                <span class="material-symbols-rounded">work</span>
+                                Casework
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- FORMS -->
+                    <div class="quick-access">
+                        <button
+                            class="quick-access-button"
+                            id="formsButton"
+                            type="button"
+                            aria-expanded="false"
+                        >
+                            <span class="material-symbols-rounded">description</span>
+                            <span>Forms</span>
+                            <span class="material-symbols-rounded dropdown-arrow">expand_more</span>
+                        </button>
+
+                        <div class="dropdown-menu" id="formsMenu" hidden>
+
+                            <button type="button" data-form="pay-by-switch">
+                                <span class="material-symbols-rounded">swap_horiz</span>
+                                Pay by Switch / LILO
+                            </button>
+
+                            <button type="button" data-form="dads">
+                                <span class="material-symbols-rounded">assignment</span>
+                                DADS
+                            </button>
+
+                            <button type="button" data-form="callback">
+                                <span class="material-symbols-rounded">call</span>
+                                Callback
+                            </button>
+
+                            <button type="button" data-form="verification-team">
+                                <span class="material-symbols-rounded">verified_user</span>
+                                Verification Team
+                            </button>
+
+                        </div>
+                    </div>
+
+                </div>
+
+           
+<!-- TIMEZONE SEARCH -->
+<div class="timezone-search-wrapper">
+
+    <button
+        type="button"
+        class="settings-trigger"
+        id="timezoneSearchButton"
+        aria-label="Search state timezone"
+        title="Search State Timezone"
+        aria-expanded="false"
+    >
+        <span class="material-symbols-rounded">search</span>
+    </button>
+
+    <div
+        class="timezone-search-panel"
+        id="timezoneSearchPanel"
+    >
+        <input
+            type="text"
+            id="timezoneSearchInput"
+            placeholder="Search US state..."
+            autocomplete="off"
+        >
+
+        <!-- OPEN MAP LINK -->
+        <a
+            href="Timezones.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="open-map-link"
+        >
+            See Map Reference
+        </a>
+
+        <div
+            id="timezoneSearchResult"
+            aria-live="polite"
+            class="timezone-search-result"
+        ></div>
+    </div>
+
+</div>
+
+
+                <!-- SETTINGS BUTTON -->
+                <button
+                    type="button"
+                    class="settings-trigger"
+                    id="settingsButton"
+                    aria-label="Open settings"
+                    title="Settings"
+                    aria-expanded="false"
+                >
+                    <span class="material-symbols-rounded">settings</span>
+                </button>
+
+            </div>
+        </header>
+
+        <!-- MAIN NOTEPAD -->
+        <main class="editor-container">
+            <textarea
+                id="noteEditor"
+                placeholder="Start typing your notes. Changes save automatically (Ctrl+S saves now)."
+                spellcheck="true"
+                autofocus
+            ></textarea>
+        </main>
+
+        <!-- NOTE STATUS BAR -->
+        <div class="editor-status" id="editorStatus">
+            <div class="status-left">
+                <span class="save-status" id="saveStatus" data-state="saved" role="status">Saved</span>
+                <span id="noteCounts">0 words, 0 characters</span>
+            </div>
+</div>
+
+        <!-- TIMEZONE FOOTER -->
+        <footer class="timezone-footer">
+
+            <div class="timezone-card" data-timezone-card="pst">
+                <div class="timezone-heading">
+                    <span class="timezone-label" data-zone="pst">PST</span>
+                </div>
+                <div class="timezone-time" data-time="pst">--:--:--</div>
+                <div class="timezone-date" data-date="pst">Loading...</div>
+            </div>
+
+            <div class="timezone-card" data-timezone-card="est">
+                <div class="timezone-heading">
+                    <span class="timezone-label" data-zone="est">EST</span>
+                </div>
+                <div class="timezone-time" data-time="est">--:--:--</div>
+                <div class="timezone-date" data-date="est">Loading...</div>
+            </div>
+
+            <div class="timezone-card" data-timezone-card="mst">
+                <div class="timezone-heading">
+                    <span class="timezone-label" data-zone="mst">MST</span>
+                </div>
+                <div class="timezone-time" data-time="mst">--:--:--</div>
+                <div class="timezone-date" data-date="mst">Loading...</div>
+            </div>
+
+            <div class="timezone-card" data-timezone-card="cst">
+                <div class="timezone-heading">
+                    <span class="timezone-label" data-zone="cst">CST</span>
+                </div>
+                <div class="timezone-time" data-time="cst">--:--:--</div>
+                <div class="timezone-date" data-date="cst">Loading...</div>
+            </div>
+
+        </footer>
+    </div>
+
+    <!-- SETTINGS PANEL -->
+    <div class="settings-overlay" id="settingsOverlay" hidden>
+        <section
+            class="settings-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="settingsTitle"
+        >
+
+            <div class="settings-header">
+                <div>
+                    <h2 id="settingsTitle">Settings</h2>
+                    <p>Personalize your Notepad workspace.</p>
+                </div>
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    id="settingsClose"
+                    aria-label="Close settings"
+                >
+                    <span class="material-symbols-rounded">close</span>
+                </button>
+            </div>
+
+            <div class="settings-content">
+
+                <!-- APPEARANCE -->
+                <section class="settings-section">
+
+                    <div class="settings-section-heading">
+                        <span class="material-symbols-rounded">palette</span>
+
+                        <div>
+                            <h3>Appearance</h3>
+                            <p>Customize your workspace appearance.</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-control">
+                        <label for="themeSelect">Theme</label>
+
+                        <select id="themeSelect" class="settings-select">
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                        </select>
+                    </div>
+
+                    <div class="settings-control font-setting-control">
+                        <label for="fontFamilySelect">Font Family</label>
+
+                        <select id="fontFamilySelect" class="settings-select">
+                            <option value="'Segoe UI', system-ui, -apple-system, Roboto, sans-serif">Segoe UI</option>
+                            <option value="Arial, Helvetica, sans-serif">Arial</option>
+                            <option value="Verdana, sans-serif">Verdana</option>
+                            <option value="Tahoma, sans-serif">Tahoma</option>
+                            <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                            <option value="Georgia, serif">Georgia</option>
+                            <option value="'Courier New', monospace">Courier New</option>
+                        </select>
+                    </div>
+
+                    <div class="settings-control font-setting-control">
+                        <label for="fontSizeSelect">Font Size</label>
+
+                        <select id="fontSizeSelect" class="settings-select">
+                            <option value="12">12 px</option>
+                            <option value="13">13 px</option>
+                            <option value="14">14 px</option>
+                            <option value="15">15 px</option>
+                            <option value="16">16 px</option>
+                            <option value="17">17 px</option>
+                            <option value="18">18 px</option>
+                            <option value="20">20 px</option>
+                        </select>
+                    </div>
+
+                </section>
+
+                <!-- TIMEZONES -->
+                <section class="settings-section">
+
+                    <div class="settings-section-heading">
+                        <span class="material-symbols-rounded">schedule</span>
+
+                        <div>
+                            <h3>Timezone Display</h3>
+                            <p>Choose which clocks appear in the footer.</p>
+                        </div>
+                    </div>
+
+                    <div class="timezone-settings">
+
+                        <label class="settings-toggle">
+                            <span>PST</span>
+                            <input type="checkbox" data-timezone-toggle="pst" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+
+                        <label class="settings-toggle">
+                            <span>EST</span>
+                            <input type="checkbox" data-timezone-toggle="est" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+
+                        <label class="settings-toggle">
+                            <span>MST</span>
+                            <input type="checkbox" data-timezone-toggle="mst" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+
+                        <label class="settings-toggle">
+                            <span>CST</span>
+                            <input type="checkbox" data-timezone-toggle="cst" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+
+                    </div>
+                </section>
+
+                <!-- CREDENTIALS -->
+                <section class="settings-section">
+
+                    <div class="settings-section-heading">
+                        <span class="material-symbols-rounded">badge</span>
+
+                        <div>
+                            <h3>Credentials</h3>
+                            <p>Update the credentials displayed in your workspace.</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-form">
+
+                        <label>
+                            Name
+                            <input type="text" id="settingsName" autocomplete="name">
+                        </label>
+
+                        <label>
+                            Oracle ID
+                            <input type="text" id="settingsOracleId">
+                        </label>
+
+                        <label>
+                            Rep ID
+                            <input type="text" id="settingsRepId">
+                        </label>
+
+                        <button
+                            type="button"
+                            class="settings-primary-button"
+                            id="saveCredentials"
+                        >
+                            Save Credentials
+                        </button>
+
+                    </div>
+                </section>
+
+                <!-- DATA MANAGEMENT -->
+                <section class="settings-section">
+
+                    <div class="settings-section-heading">
+                        <span class="material-symbols-rounded">database</span>
+
+                        <div>
+                            <h3>Data Management</h3>
+                            <p>Keep a backup of your Notepad information.</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-data-actions">
+
+                        <button
+                            type="button"
+                            class="settings-secondary-button"
+                            id="exportBackup"
+                        >
+                            <span class="material-symbols-rounded">download</span>
+                            Export Backup
+                        </button>
+
+                        <button
+                            type="button"
+                            class="settings-secondary-button"
+                            id="importBackupButton"
+                        >
+                            <span class="material-symbols-rounded">upload</span>
+                            Import Backup
+                        </button>
+
+                        <input
+                            type="file"
+                            id="importBackupFile"
+                            accept=".json,application/json"
+                            hidden
+                        >
+
+                    </div>
+
+                    <p class="settings-help">
+                        Importing a backup replaces matching Notepad data stored in this browser.
+                    </p>
+
+                </section>
+
+            </div>
+
+            <div class="settings-footer">
+                <span>Settings are saved automatically where applicable.</span>
+
+                <button
+                    type="button"
+                    class="settings-close-button"
+                    id="settingsDone"
+                >
+                    Done
+                </button>
+            </div>
+
+        </section>
+    </div>
+
+    <!-- SHARED DIALOG -->
+    <div class="dialog-overlay" id="dialogOverlay" hidden>
+        <section
+            class="custom-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="dialogTitle"
+        >
+
+            <div class="dialog-header">
+                <div>
+                    <h2 id="dialogTitle">Quick Access</h2>
+                    <p id="dialogDescription">Saved information.</p>
+                </div>
+
+                <button
+                    class="icon-button"
+                    id="dialogClose"
+                    type="button"
+                    aria-label="Close dialog"
+                >
+                    <span class="material-symbols-rounded">close</span>
+                </button>
+            </div>
+
+            <div class="dialog-content" id="dialogContent"></div>
+            <div class="dialog-actions" id="dialogActions"></div>
+
+        </section>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div
+        class="notification-container"
+        id="notificationContainer"
+        aria-live="polite"
+        aria-atomic="true"
+    ></div>
+
+    <!-- JAVASCRIPT -->
+    <script src="shared.js"></script>
+    <script src="dialog.js"></script>
+    <script src="notepad.js"></script>
+    <script src="quick-access.js"></script>
+    <script src="settings.js"></script>
+    <script src="timezone.js"></script>
+    <script src="forms.js"></script>
+
+</body>
+</html>

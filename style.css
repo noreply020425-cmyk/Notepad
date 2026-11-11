@@ -1,0 +1,82 @@
+/* Login page: flat, Windows-style */
+:root {
+    color-scheme: light;
+    --canvas: #F3F3F3; --surface: #FFFFFF; --field: #FFFFFF;
+    --text: #1B1B1B; --muted: #616161; --border: #D6D6D6; --hover: #E6E6E6;
+    --accent: #005FB8; --accent-hover: #004A91; --on-accent: #FFFFFF;
+}
+[data-theme="dark"] {
+    color-scheme: dark;
+    --canvas: #202020; --surface: #2B2B2B; --field: #1F1F1F;
+    --text: #FFFFFF; --muted: #AAAAAA; --border: #404040; --hover: #3A3A3A;
+    --accent: #60CDFF; --accent-hover: #8AD9FF; --on-accent: #003350;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html:not(.icons-ready) .material-symbols-rounded { visibility: hidden; }
+
+body {
+    margin: 0; min-height: 100vh; padding: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
+    font-size: 13px;
+    background: var(--canvas); color: var(--text);
+}
+.login-container {
+    width: 100%; max-width: 380px; padding: 24px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+}
+.header { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+.brand-mark { display: grid; place-items: center; color: var(--accent); }
+.brand-mark .material-symbols-rounded { font-size: 30px; }
+.header-copy { flex: 1; min-width: 0; }
+.header h1 { margin: 0; font-size: 18px; font-weight: 600; }
+.header p { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+
+.material-symbols-rounded {
+    font-family: 'Material Symbols Rounded'; font-weight: normal; font-style: normal;
+    font-size: 20px; line-height: 1; display: inline-flex; align-items: center;
+    justify-content: center; white-space: nowrap; direction: ltr;
+    font-feature-settings: 'liga'; -webkit-font-feature-settings: 'liga';
+}
+.theme-btn {
+    width: 32px; height: 32px; display: grid; place-items: center; cursor: pointer;
+    border: none; border-radius: 4px; background: transparent; color: var(--text);
+}
+.theme-btn:hover { background: var(--hover); }
+
+.form-group { margin-bottom: 14px; }
+label { display: block; margin-bottom: 5px; font-size: 12px; }
+input {
+    display: block; width: 100%; height: 34px; padding: 0 10px;
+    font: inherit; color: var(--text);
+    background: var(--field); border: 1px solid var(--border);
+    border-bottom-color: var(--muted); border-radius: 4px; outline: none;
+}
+input::placeholder { color: var(--muted); opacity: .8; }
+input:focus { border-color: var(--accent); border-bottom-width: 2px; }
+
+.launch-btn {
+    width: 100%; height: 34px; margin-top: 6px; display: flex;
+    align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+    font: inherit; background: var(--accent); color: var(--on-accent);
+    border: none; border-radius: 4px;
+}
+.launch-btn:hover { background: var(--accent-hover); }
+:is(button, input):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.privacy-note { display: flex; gap: 8px; align-items: flex-start; margin: 16px 0 0; font-size: 12px; line-height: 1.5; color: var(--muted); }
+.privacy-note .material-symbols-rounded { font-size: 16px; margin-top: 1px; }
+.actions { text-align: center; margin-top: 12px; }
+#clearCredentials {
+    display: inline-flex; align-items: center; gap: 5px; cursor: pointer;
+    background: none; border: none; color: var(--muted); font: inherit; font-size: 12px;
+}
+#clearCredentials .material-symbols-rounded { font-size: 16px; }
+#clearCredentials:hover { color: #C42B1C; }
+footer { text-align: center; margin-top: 20px; font-size: 11px; color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* Segoe UI everywhere (icons keep their own font) */
+*, *::before, *::after { font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif; }
