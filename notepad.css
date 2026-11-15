@@ -1,0 +1,2011 @@
+:root {
+    color-scheme: light;
+
+    --canvas: #FFFFFF;
+    --background: #FFFFFF;
+    --surface: #F3F3F3;
+    --text: #1B1B1B;
+    --muted: #616161;
+    --border: #E0E0E0;
+    --hover: #E6E6E6;
+    --accent: #005FB8;
+    --accent-hover: #004A91;
+    --on-accent: #FFFFFF;
+    --accent-soft: rgba(0, 95, 184, 0.12);
+    --success: #0F7B0F;
+    --danger: #C42B1C;
+    --shadow-sm: none;
+    --shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+
+[data-theme="dark"] {
+    color-scheme: dark;
+
+    --canvas: #202020;
+    --background: #202020;
+    --surface: #2B2B2B;
+    --text: #FFFFFF;
+    --muted: #AAAAAA;
+    --border: #3D3D3D;
+    --hover: #3A3A3A;
+    --accent: #60CDFF;
+    --accent-hover: #8AD9FF;
+    --on-accent: #003350;
+    --accent-soft: rgba(96, 205, 255, 0.16);
+    --success: #6CCB5F;
+    --danger: #FF99A4;
+    --shadow-sm: none;
+    --shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    background: var(--background);
+    color: var(--text);
+    font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+    transition: background 0.2s, color 0.2s;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+button,
+textarea {
+    font: inherit;
+}
+
+/* ==========================================
+   WORKSPACE
+========================================== */
+
+.workspace {
+    width: 100%;
+    height: 100dvh;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--background);
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.workspace-header {
+    min-height: 58px;
+    padding: 0 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: relative;
+    z-index: 1000;
+    overflow: visible;
+    flex-shrink: 0;
+}
+
+.user-details {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 22px;
+    min-width: 0;
+}
+
+.user-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--muted);
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.user-item .material-symbols-rounded {
+    font-size: 17px;
+    color: var(--muted);
+}
+
+/* ==========================================
+   HEADER DROPDOWNS
+========================================== */
+
+.header-dropdowns {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    position: relative;
+    z-index: 1001;
+    overflow: visible;
+}
+
+.quick-access {
+    position: relative;
+    z-index: 1002;
+    overflow: visible;
+}
+
+.quick-access-button {
+    height: 36px;
+    padding: 0 11px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.quick-access-button:hover {
+    background: var(--hover);
+}
+
+.quick-access-button > .material-symbols-rounded {
+    font-size: 18px;
+}
+
+.quick-access-button .dropdown-arrow {
+    font-size: 17px;
+    color: var(--muted);
+    transition: transform 0.2s;
+}
+
+.quick-access-button[aria-expanded="true"] .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* ==========================================
+   DROPDOWN MENU
+========================================== */
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 185px;
+    padding: 5px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    z-index: 1002;
+}
+
+.dropdown-menu button {
+    width: 100%;
+    min-height: 38px;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.dropdown-menu button:hover {
+    background: var(--hover);
+}
+
+.dropdown-menu button .material-symbols-rounded {
+    font-size: 18px;
+    color: var(--muted);
+}
+
+/* ==========================================
+   MAIN EDITOR
+========================================== */
+
+.editor-container {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    padding: 18px 22px;
+    background: var(--background);
+    position: relative;
+    z-index: 1;
+}
+
+#noteEditor {
+    width: 100%;
+    height: 100%;
+    resize: none;
+    outline: none;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+#noteEditor::placeholder {
+    color: var(--muted);
+    opacity: 0.7;
+}
+
+/* ==========================================
+   TIMEZONE FOOTER
+========================================== */
+
+.timezone-footer {
+    min-height: 75px;
+    padding: 10px 22px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+}
+
+.timezone-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+}
+
+.timezone-label {
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+}
+
+.timezone-time {
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.timezone-date {
+    color: var(--muted);
+    font-size: 10px;
+}
+
+/* ==========================================
+   DIALOG
+========================================== */
+
+.dialog-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.custom-dialog {
+    width: 100%;
+    max-width: 520px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.dialog-header {
+    padding: 17px 19px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    border-bottom: 1px solid var(--border);
+}
+
+.dialog-header h2 {
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.dialog-header p {
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.dialog-content {
+    padding: 12px 18px;
+    overflow-y: auto;
+}
+
+.dialog-actions {
+    padding: 12px 18px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    border-top: 1px solid var(--border);
+}
+
+.icon-button {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 5px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+.icon-button:hover {
+    background: var(--hover);
+    color: var(--text);
+}
+
+.icon-button .material-symbols-rounded {
+    font-size: 18px;
+}
+
+/* ==========================================
+   QUICK ACCESS ENTRY LIST
+========================================== */
+
+.entry-item {
+    padding: 11px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.entry-item:last-child {
+    border-bottom: none;
+}
+
+.entry-details {
+    min-width: 0;
+    flex: 1;
+}
+
+.entry-title {
+    margin-bottom: 4px;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.entry-value {
+    overflow-wrap: anywhere;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.entry-actions {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.empty-state {
+    padding: 30px 12px;
+    color: var(--muted);
+    text-align: center;
+    font-size: 12px;
+}
+
+.confirmation-message {
+    padding: 12px 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* ==========================================
+   DIALOG BUTTONS
+========================================== */
+
+.dialog-button {
+    min-height: 34px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.dialog-button:hover {
+    background: var(--hover);
+}
+
+.dialog-button.danger {
+    border-color: var(--danger);
+    background: var(--danger);
+    color: #ffffff;
+}
+
+.dialog-button.secondary {
+    background: transparent;
+}
+
+/* ==========================================
+   CATEGORY NOTES
+========================================== */
+
+.category-note-editor {
+    width: 100%;
+    min-height: 260px;
+    resize: vertical;
+    padding: 12px;
+    outline: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--background);
+    color: var(--text);
+    font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.category-note-editor:focus {
+    border-color: var(--muted);
+}
+
+.note-save-message {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+/* ==========================================
+   NOTIFICATIONS
+========================================== */
+
+.notification-container {
+    position: fixed;
+    right: 18px;
+    bottom: 95px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.notification {
+    min-width: 190px;
+    max-width: 300px;
+    padding: 11px 14px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: var(--shadow);
+    font-size: 11px;
+    animation: notificationIn 0.2s ease;
+}
+
+.notification .material-symbols-rounded {
+    font-size: 17px;
+}
+
+.notification.error .material-symbols-rounded {
+    color: var(--danger);
+}
+
+@keyframes notificationIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================
+   PHONETIME / CASEWORK WORKSPACE
+========================================== */
+
+.template-workspace {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    display: block;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 12px 25px;
+    background: var(--background);
+    position: relative;
+    z-index: 1;
+}
+
+/* ==========================================
+   INDIVIDUAL NOTE ENTRY
+========================================== */
+
+.template-entry-line {
+    width: 100%;
+    display: block;
+    background: transparent;
+    margin: 0;
+    padding: 0;
+}
+
+.template-entry-line.is-done {
+    opacity: 0.55;
+}
+
+/* ==========================================
+   NOTE TEXTAREA
+========================================== */
+
+.plain-template-editor {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+    padding: 8px 0 2px;
+    margin: 0;
+    resize: none;
+    overflow: hidden;
+    outline: none;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    color: var(--text);
+    font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+    font-size: 13px;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.plain-template-editor:focus {
+    outline: none;
+}
+
+.plain-template-editor::placeholder {
+    color: var(--muted);
+    opacity: 0.7;
+}
+
+/* ==========================================
+   ENTRY ACTION BUTTONS
+========================================== */
+
+.template-entry-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 0 8px;
+    margin: 0;
+    border: none;
+}
+
+.template-entry-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 5px 8px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--muted);
+    font-family: inherit;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.template-entry-button:hover {
+    background: var(--hover);
+    color: var(--text);
+}
+
+.template-entry-button .material-symbols-rounded {
+    font-size: 16px;
+}
+
+.template-entry-button.done-button {
+    color: #168553;
+}
+
+.template-entry-button.done-button:hover {
+    background: rgba(34, 160, 107, 0.08);
+}
+
+.template-entry-button.completed {
+    background: rgba(34, 160, 107, 0.1);
+    color: #168553;
+    cursor: default;
+}
+
+.template-entry-button:disabled {
+    opacity: 1;
+}
+
+/* ==========================================
+   DIVIDER BETWEEN ENTRIES
+========================================== */
+
+.template-entry-line + .template-entry-line {
+    margin: 0;
+    padding: 5px 0 0;
+    border-top: 1px solid var(--border);
+}
+
+/* Empty template entries */
+
+.plain-template-editor:empty {
+    min-height: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.template-entry-line.empty-entry {
+    border: none !important;
+    border-bottom: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+}
+
+.template-entry-actions[hidden] {
+    display: none !important;
+}
+
+.template-entry-line[hidden] {
+    display: none !important;
+}
+
+/* ==========================================
+   HEADER ACTIONS
+========================================== */
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.settings-trigger {
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.settings-trigger:hover,
+.settings-trigger[aria-expanded="true"] {
+    background: var(--hover);
+    color: var(--text);
+}
+
+.settings-trigger .material-symbols-rounded {
+    font-size: 20px;
+}
+
+/* ==========================================
+   SETTINGS OVERLAY
+========================================== */
+
+.settings-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1500;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(2px);
+}
+
+/* ==========================================
+   SETTINGS PANEL
+========================================== */
+
+.settings-panel {
+    width: 100%;
+    max-width: 560px;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    animation: settingsAppear 0.2s ease;
+}
+
+@keyframes settingsAppear {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================
+   SETTINGS HEADER
+========================================== */
+
+.settings-header {
+    padding: 19px 21px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    border-bottom: 1px solid var(--border);
+}
+
+.settings-header h2 {
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.settings-header p {
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+/* ==========================================
+   SETTINGS CONTENT
+========================================== */
+
+.settings-content {
+    padding: 5px 21px;
+    overflow-y: auto;
+}
+
+.settings-section {
+    padding: 19px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.settings-section:last-child {
+    border-bottom: none;
+}
+
+.settings-section-heading {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 15px;
+}
+
+.settings-section-heading > .material-symbols-rounded {
+    font-size: 21px;
+    color: var(--muted);
+}
+
+.settings-section-heading h3 {
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.settings-section-heading p {
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+/* ==========================================
+   SETTINGS SELECT
+========================================== */
+
+.settings-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.settings-control label {
+    color: var(--text);
+    font-size: 12px;
+}
+
+.settings-select {
+    min-width: 125px;
+    height: 34px;
+    padding: 0 10px;
+    outline: none;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--background);
+    color: var(--text);
+    font-size: 11px;
+    cursor: pointer;
+}
+
+/* ==========================================
+   TIMEZONE SETTINGS
+========================================== */
+
+.timezone-settings {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 9px;
+}
+
+.settings-toggle {
+    position: relative;
+    min-height: 38px;
+    padding: 0 9px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 7px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text);
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.settings-toggle input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.toggle-slider {
+    position: relative;
+    width: 27px;
+    height: 15px;
+    flex-shrink: 0;
+    border-radius: 20px;
+    background: var(--border);
+    transition: background 0.2s;
+}
+
+.toggle-slider::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #ffffff;
+    transition: transform 0.2s;
+}
+
+.settings-toggle input:checked + .toggle-slider {
+    background: #168553;
+}
+
+.settings-toggle input:checked + .toggle-slider::after {
+    transform: translateX(12px);
+}
+
+.settings-toggle input:focus-visible + .toggle-slider {
+    outline: 2px solid var(--muted);
+    outline-offset: 3px;
+}
+
+/* ==========================================
+   CREDENTIAL SETTINGS
+========================================== */
+
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+}
+
+.settings-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.settings-form input {
+    width: 100%;
+    height: 36px;
+    padding: 0 10px;
+    outline: none;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--background);
+    color: var(--text);
+    font-size: 12px;
+}
+
+.settings-form input:focus,
+.settings-select:focus {
+    border-color: var(--muted);
+}
+
+/* ==========================================
+   SETTINGS BUTTONS
+========================================== */
+
+.settings-primary-button,
+.settings-secondary-button,
+.settings-close-button {
+    min-height: 35px;
+    padding: 0 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 11px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.settings-primary-button {
+    align-self: flex-start;
+    border-color: #168553;
+    background: #168553;
+    color: #ffffff;
+}
+
+.settings-primary-button:hover {
+    background: #126d43;
+}
+
+.settings-secondary-button:hover,
+.settings-close-button:hover {
+    background: var(--hover);
+}
+
+.settings-secondary-button .material-symbols-rounded {
+    font-size: 17px;
+}
+
+.settings-data-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.settings-help {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+/* ==========================================
+   SETTINGS FOOTER
+========================================== */
+
+.settings-footer {
+    min-height: 58px;
+    padding: 10px 21px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-top: 1px solid var(--border);
+}
+
+.settings-footer > span {
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.settings-close-button {
+    min-width: 70px;
+}
+
+/* ==========================================
+   CUSTOM USER FONT SETTINGS
+========================================== */
+
+#noteEditor,
+.plain-template-editor,
+.category-note-editor,
+.entry-title,
+.entry-value,
+.dialog-content {
+    font-family: var(--notepad-font-family, 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif);
+}
+
+#noteEditor,
+.plain-template-editor,
+.category-note-editor {
+    font-size: var(--notepad-font-size, 14px);
+}
+
+.font-setting-control {
+    margin-top: 12px;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 700px) {
+
+    .workspace-header {
+        padding: 10px 12px;
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+        position: relative;
+        z-index: 1000;
+        overflow: visible;
+    }
+
+    .user-details {
+        gap: 12px;
+    }
+
+    .header-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .header-dropdowns {
+        width: 100%;
+        position: relative;
+        z-index: 1001;
+        overflow: visible;
+    }
+
+    .quick-access {
+        position: relative;
+        z-index: 1002;
+    }
+
+    .quick-access-button {
+        height: 34px;
+    }
+
+    .dropdown-menu {
+        z-index: 1002 !important;
+    }
+
+    .editor-container {
+        padding: 12px;
+    }
+
+    .timezone-footer {
+        padding: 9px 5px;
+        gap: 4px;
+    }
+
+    .timezone-time {
+        font-size: 12px;
+    }
+
+    .timezone-date {
+        font-size: 9px;
+    }
+
+    .entry-item {
+        align-items: flex-start;
+    }
+
+    .entry-actions {
+        flex-shrink: 0;
+    }
+
+    .template-workspace {
+        padding: 10px 12px;
+    }
+
+    .plain-template-editor {
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .template-entry-actions {
+        padding-bottom: 7px;
+        gap: 5px;
+    }
+
+    .template-entry-button {
+        padding: 7px 9px;
+    }
+
+    .settings-panel {
+        max-height: 90vh;
+    }
+
+    .settings-content {
+        padding: 5px 15px;
+    }
+
+    .settings-header,
+    .settings-footer {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .timezone-settings {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .settings-overlay {
+        padding: 10px;
+    }
+}
+
+@media (max-width: 400px) {
+
+    .timezone-label {
+        font-size: 9px;
+        letter-spacing: 0.4px;
+    }
+
+    .timezone-time {
+        font-size: 11px;
+    }
+
+    .timezone-date {
+        font-size: 8px;
+    }
+
+    .settings-footer > span {
+        max-width: 180px;
+        line-height: 1.4;
+    }
+
+    .settings-data-actions {
+        flex-direction: column;
+    }
+
+    .settings-secondary-button {
+        width: 100%;
+    }
+}
+
+
+
+/* ==========================================
+   QUICK ACCESS DROPDOWN - VIEWPORT FIX
+========================================== */
+
+.workspace,
+.workspace-header,
+.header-dropdowns,
+.quick-access {
+    overflow: visible !important;
+}
+
+.quick-access {
+    position: relative;
+    z-index: 10000;
+}
+
+.dropdown-menu,
+#quickAccessMenu,
+#notesMenu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    left: auto;
+    width: 220px;
+    max-width: calc(100vw - 24px);
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 10001 !important;
+}
+
+
+/* ==========================================
+   QUICK ACCESS MENU - LEFT ALIGNMENT FIX
+========================================== */
+
+.quick-access {
+    position: relative;
+}
+
+#quickAccessMenu {
+    position: absolute !important;
+    top: calc(100% + 8px) !important;
+    left: 0 !important;
+    right: auto !important;
+    width: 185px;
+    max-width: calc(100vw - 24px);
+    z-index: 10001 !important;
+}
+
+/* Notes dropdown */
+#notesMenu {
+    position: absolute !important;
+    top: calc(100% + 8px) !important;
+    right: 0 !important;
+    left: auto !important;
+    z-index: 10001 !important;
+}
+
+
+/* Apply selected font size to all note editors */
+#noteEditor,
+.plain-template-editor {
+    font-size: var(--notepad-font-size, 14px) !important;
+}
+
+/* ==========================================
+   USER FONT SETTINGS
+========================================== */
+
+:root {
+    --notepad-font-family: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+    --notepad-font-size: 14px;
+}
+
+#noteEditor,
+.plain-template-editor {
+    font-family: var(--notepad-font-family) !important;
+    font-size: var(--notepad-font-size) !important;
+}
+
+
+/* ==========================================
+   TIMEZONE SEARCH
+========================================== */
+
+.timezone-search-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.timezone-search-panel {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 280px;
+    padding: 12px;
+    padding-bottom: 2px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    z-index: 1000;
+    display: none;
+}
+
+.timezone-search-panel.active {
+    display: block;
+    animation: timezoneSearchOpen 0.2s ease;
+}
+
+#timezoneSearchInput {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    outline: none;
+    background: var(--background);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+}
+
+#timezoneSearchInput:focus {
+    border-color: var(--muted);
+}
+
+.timezone-search-result {
+    margin-top: 10px;
+    color: var(--text);
+    font-size: 13px;
+}
+
+.timezone-result-state {
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.timezone-result-item {
+    padding: 9px 0;
+    border-top: 1px solid var(--border);
+}
+
+.timezone-result-name {
+    font-weight: 600;
+}
+
+.timezone-result-details {
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.timezone-search-empty {
+    color: var(--muted);
+    padding: 8px 0;
+    font-size: 12px;
+}
+
+@keyframes timezoneSearchOpen {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* FIX: Ensure hidden dropdowns stay hidden */
+.dropdown-menu[hidden] {
+    display: none !important;
+}
+
+
+.open-map-link {
+    display: block;
+    margin-top: 8px;
+    margin-bottom: 0;
+    padding: 0;
+    color: #2583e8;
+    font-size: 12px;
+    text-decoration: none;
+    text-align: center;
+    cursor: pointer;
+}
+.open-map-link:hover {
+    color: #1264bd;
+    text-decoration: none;
+}
+
+/* ==========================================
+   FLAT LAYER (Windows Notepad style)
+========================================== */
+
+html:not(.icons-ready) .material-symbols-rounded { visibility: hidden; }
+
+html, body { background: var(--canvas); }
+
+body {
+    font-family: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
+    font-size: 12px;
+}
+
+* { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+
+:is(button, a, input, select):focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+}
+
+.workspace { background: var(--canvas); padding: 0; gap: 0; }
+
+/* ----- Title / menu bar ----- */
+
+.workspace-header {
+    min-height: 40px;
+    padding: 0 8px 0 12px;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    background: var(--surface);
+    box-shadow: none;
+}
+
+.header-identity { display: flex; align-items: center; gap: 14px; min-width: 0; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 8px; }
+.brand .brand-mark { display: inline-flex; background: none; color: var(--accent); width: auto; height: auto; }
+.brand .brand-mark .material-symbols-rounded { font-size: 20px; }
+.brand-name { font-size: 12px; font-weight: 400; }
+.user-avatar { display: none; }
+
+.user-details { gap: 14px; padding-left: 14px; border-left: 1px solid var(--border); }
+.user-details .user-item { padding: 0; background: none; border-radius: 0; font-size: 12px; font-weight: 400; color: var(--muted); }
+.user-details .user-item.user-name { color: var(--text); padding: 0; }
+.user-item .material-symbols-rounded { font-size: 16px; }
+
+.header-actions { gap: 2px; }
+.header-dropdowns { gap: 0; }
+
+.quick-access-button,
+.settings-trigger {
+    height: 30px;
+    padding: 0 10px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.settings-trigger { width: 32px; padding: 0; color: var(--text); }
+
+.quick-access-button:hover,
+.settings-trigger:hover { background: var(--hover); color: var(--text); }
+
+.quick-access-button[aria-expanded="true"],
+.settings-trigger[aria-expanded="true"] { background: var(--hover); color: var(--text); border: none; }
+
+.quick-access-button > .material-symbols-rounded { font-size: 17px; }
+
+/* ----- Menus (flat, thin border) ----- */
+
+.dropdown-menu {
+    padding: 4px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.dropdown-menu button { min-height: 32px; border-radius: 4px; font-size: 12px; }
+.dropdown-menu button:hover { background: var(--hover); }
+.dropdown-menu button:hover .material-symbols-rounded { color: var(--text); }
+
+/* ----- Text area: full-bleed ----- */
+
+.editor-container { padding: 0; background: var(--background); }
+
+#noteEditor,
+.template-workspace {
+    background: var(--background);
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+#noteEditor { padding: 10px 14px; line-height: 1.5; }
+#noteEditor:focus { box-shadow: none; border: none; }
+
+.template-workspace { padding: 6px 14px; }
+
+.template-entry-button { border-radius: 4px; padding: 4px 8px; font-weight: 400; }
+.template-entry-button:hover { background: var(--hover); color: var(--text); }
+.template-entry-button.done-button { color: var(--success); }
+.template-entry-button.done-button:hover { background: var(--hover); color: var(--success); }
+.template-entry-button.completed { color: var(--success); }
+
+/* ----- Status bar ----- */
+
+.editor-status {
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+    min-height: 28px;
+    padding: 0 8px 0 14px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.status-left, .status-right { display: flex; align-items: center; gap: 16px; }
+
+.save-status { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-weight: 400; }
+.save-status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
+.save-status[data-state="saving"]::before { background: var(--muted); }
+.save-status[data-state="error"] { color: var(--danger); }
+.save-status[data-state="error"]::before { background: var(--danger); }
+
+.status-button {
+    display: inline-flex; align-items: center; gap: 5px;
+    height: 22px; padding: 0 8px;
+    border: none; border-radius: 4px;
+    background: transparent; color: var(--muted);
+    font-size: 12px; font-weight: 400; cursor: pointer;
+}
+
+.status-button .material-symbols-rounded { font-size: 15px; }
+.status-button:hover { background: var(--hover); color: var(--text); }
+.status-button.danger:hover { color: var(--danger); }
+
+/* ----- Clock strip ----- */
+
+.timezone-footer {
+    min-height: 0;
+    padding: 0;
+    gap: 0;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+}
+
+.timezone-card {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 2px 8px;
+    padding: 6px 10px;
+    border: none;
+    border-right: 1px solid var(--border);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.timezone-card:last-child,
+.timezone-card:nth-last-child(1 of :not([hidden])) { border-right: none; }
+
+.timezone-heading { display: flex; align-items: center; gap: 6px; }
+
+.timezone-heading::before {
+    content: "";
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+    opacity: 0.35;
+}
+
+.timezone-card.is-day .timezone-heading::before { background: var(--success); opacity: 1; box-shadow: none; }
+
+.timezone-label { font-size: 11px; font-weight: 600; letter-spacing: 0; }
+.timezone-time { font-size: 14px; font-weight: 600; letter-spacing: 0; }
+.timezone-date { font-size: 11px; flex-basis: 100%; text-align: center; }
+
+/* ----- Dialogs and settings ----- */
+
+.dialog-overlay, .settings-overlay, .forms-overlay { background: rgba(0, 0, 0, 0.35); backdrop-filter: none; }
+
+.custom-dialog, .settings-panel {
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.dialog-header, .settings-header, .dialog-actions, .settings-footer { border-color: var(--border); }
+.dialog-header h2, .settings-header h2 { font-size: 15px; font-weight: 600; letter-spacing: 0; }
+.dialog-header p, .settings-header p { font-size: 12px; }
+
+.icon-button { width: 30px; height: 30px; border-radius: 4px; }
+.icon-button:hover { background: var(--hover); color: var(--text); }
+
+.entry-item { padding: 10px 6px; border-radius: 4px; border-bottom: 1px solid var(--border); }
+.entry-item:last-child { border-bottom: none; }
+.entry-item:hover { background: var(--hover); }
+.entry-title { font-size: 12px; }
+.entry-value { font-size: 12px; }
+
+.settings-section-heading > .material-symbols-rounded { color: var(--muted); }
+.settings-section-heading h3 { font-size: 13px; }
+.settings-section-heading p { font-size: 11px; }
+.settings-control label { font-size: 12px; }
+
+.settings-select, .settings-form input, .category-note-editor, #timezoneSearchInput {
+    height: 32px; border-radius: 4px; font-size: 12px; background: var(--background);
+}
+
+.category-note-editor { height: auto; }
+.settings-toggle { border-radius: 4px; min-height: 36px; }
+
+.settings-form input:focus, .settings-select:focus, #timezoneSearchInput:focus, .category-note-editor:focus {
+    border-color: var(--accent);
+    box-shadow: none;
+    outline: 1px solid var(--accent);
+}
+
+.settings-toggle input:checked + .toggle-slider { background: var(--accent); }
+.settings-toggle input:checked + .toggle-slider::after { background: var(--on-accent); }
+
+.settings-primary-button, .settings-secondary-button, .settings-close-button, .dialog-button {
+    min-height: 32px; border-radius: 4px; font-weight: 400; font-size: 12px;
+}
+
+.settings-primary-button { border-color: var(--accent); background: var(--accent); color: var(--on-accent); }
+.settings-primary-button:hover { background: var(--accent-hover); }
+.settings-secondary-button:hover, .settings-close-button:hover, .dialog-button:hover { background: var(--hover); }
+
+/* ----- Toasts ----- */
+
+.notification {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--success);
+    border-radius: 4px;
+    font-size: 12px; font-weight: 400;
+    box-shadow: var(--shadow);
+}
+
+.notification .material-symbols-rounded { color: var(--success); }
+.notification.error { border-left-color: var(--danger); }
+.notification.error .material-symbols-rounded { color: var(--danger); }
+.notification.info { border-left-color: var(--accent); }
+.notification.info .material-symbols-rounded { color: var(--accent); }
+
+/* ----- Timezone search ----- */
+
+.timezone-search-panel { width: 290px; padding: 10px 10px 4px; border-radius: 8px; box-shadow: var(--shadow); }
+.timezone-result-state { font-size: 13px; }
+.timezone-result-time { margin-top: 4px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.timezone-also { margin: 8px 0 2px; color: var(--muted); font-size: 11px; }
+
+button.timezone-result-item {
+    display: block; width: 100%;
+    padding: 7px 8px;
+    border: none; border-radius: 4px;
+    background: none; color: inherit;
+    font: inherit; text-align: left; cursor: pointer;
+}
+
+button.timezone-result-item:hover { background: var(--hover); }
+.open-map-link { color: var(--accent); font-weight: 400; padding-bottom: 8px; }
+.open-map-link:hover { color: var(--accent-hover); text-decoration: underline; }
+
+/* ----- Forms modal ----- */
+
+.forms-overlay .forms-modal { border-radius: 8px; padding: 20px; box-shadow: var(--shadow); background: var(--surface); }
+.forms-overlay .forms-modal-title { font-size: 15px; font-weight: 600; }
+.forms-overlay .forms-field input,
+.forms-overlay .forms-field select,
+.forms-overlay .forms-field textarea { border-radius: 4px; background: var(--background); }
+.forms-overlay .forms-field input:focus,
+.forms-overlay .forms-field select:focus,
+.forms-overlay .forms-field textarea:focus { border-color: var(--accent); box-shadow: none; }
+.forms-overlay .forms-action-button { border-radius: 4px; font-weight: 400; }
+.forms-overlay .forms-copy-button { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.forms-overlay .forms-copy-button:hover { background: var(--accent-hover); opacity: 1; }
+
+/* ----- Responsive ----- */
+
+@media (max-width: 700px) {
+    .workspace-header { padding: 8px 10px; }
+    .user-details { padding-left: 0; border-left: none; flex-wrap: wrap; gap: 10px; }
+    #noteEditor { padding: 10px 12px; }
+    .timezone-footer { grid-template-columns: repeat(2, 1fr); }
+    .timezone-card:nth-child(2n) { border-right: none; }
+    .notification-container { bottom: 120px; }
+    .status-button { font-size: 0; gap: 0; }
+    .status-button .material-symbols-rounded { font-size: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+/* ==========================================
+   ONE UI FONT: Segoe UI everywhere
+   (lowest specificity, so icons and the
+   editor font setting still take priority)
+========================================== */
+
+:root { --ui-font: 'Segoe UI Variable Text', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif; }
+
+*, *::before, *::after { font-family: var(--ui-font); }
+
+button, input, select, textarea { font-family: var(--ui-font); }
+
+/* ==========================================
+   CLOCK FOOTER: always one row, one line each
+========================================== */
+
+.timezone-footer { display: flex; flex-wrap: nowrap; }
+
+.timezone-card {
+    flex: 1 1 0;
+    min-width: 0;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 6px 8px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.timezone-heading { flex-shrink: 0; }
+.timezone-time { flex-shrink: 0; }
+.timezone-date { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+
+@media (max-width: 900px) {
+    .timezone-date { display: none; }
+}
+
+@media (max-width: 700px) {
+    .timezone-card:nth-child(2n) { border-right: 1px solid var(--border); }
+    .timezone-card:last-child { border-right: none; }
+    .timezone-time { font-size: 13px; }
+}
+
+@media (max-width: 460px) {
+    .timezone-card { gap: 5px; padding: 6px 4px; }
+    .timezone-label { font-size: 10px; }
+    .timezone-time { font-size: 11.5px; }
+}
+
+/* ==========================================
+   FORMS: same look as the login card
+========================================== */
+
+.forms-overlay { background: rgba(0, 0, 0, 0.35); backdrop-filter: none; }
+
+.forms-overlay .forms-modal {
+    max-width: 480px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.forms-overlay .forms-modal-header { margin-bottom: 20px; }
+.forms-overlay .forms-modal-title { font-size: 18px; font-weight: 600; letter-spacing: 0; }
+
+.forms-overlay .forms-close {
+    width: 32px; height: 32px;
+    display: grid; place-items: center;
+    border: none; border-radius: 4px;
+    background: transparent; color: var(--text);
+    font-size: 20px; line-height: 1;
+}
+
+.forms-overlay .forms-close:hover { background: var(--hover); color: var(--text); }
+
+.forms-overlay .forms-fields { gap: 14px; }
+
+.forms-overlay .forms-field label {
+    margin-bottom: 5px;
+    font-size: 12px; font-weight: 400;
+    color: var(--text);
+}
+
+.forms-overlay .forms-field input,
+.forms-overlay .forms-field select {
+    height: 34px;
+    padding: 0 10px;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-bottom-color: var(--muted);
+    border-radius: 4px;
+    outline: none;
+}
+
+.forms-overlay .forms-field textarea {
+    padding: 8px 10px;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-bottom-color: var(--muted);
+    border-radius: 4px;
+    outline: none;
+}
+
+.forms-overlay .forms-field input:focus,
+.forms-overlay .forms-field select:focus,
+.forms-overlay .forms-field textarea:focus {
+    border-color: var(--accent);
+    border-bottom-width: 2px;
+    box-shadow: none;
+}
+
+.forms-overlay .forms-actions { margin-top: 20px; gap: 8px; }
+
+.forms-overlay .forms-action-button {
+    height: 34px;
+    padding: 0 16px;
+    font-size: 13px; font-weight: 400;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: transparent; color: var(--text);
+}
+
+.forms-overlay .forms-action-button:hover { background: var(--hover); }
+.forms-overlay .forms-reset-button:hover { color: var(--danger); }
+
+.forms-overlay .forms-copy-button {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--on-accent);
+}
+
+.forms-overlay .forms-copy-button:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+/* ==========================================
+   QUICK ACCESS DIALOG (Links, Contacts, Templates)
+   Same look as the login card and the forms
+========================================== */
+
+.dialog-overlay { background: rgba(0, 0, 0, 0.35); backdrop-filter: none; }
+
+.custom-dialog {
+    max-width: 480px;
+    padding: 24px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.custom-dialog .dialog-header {
+    padding: 0;
+    margin-bottom: 18px;
+    align-items: center;
+    border-bottom: none;
+}
+
+.custom-dialog .dialog-header h2 { font-size: 18px; font-weight: 600; letter-spacing: 0; }
+.custom-dialog .dialog-header p { margin-top: 3px; font-size: 12px; color: var(--muted); }
+
+.custom-dialog .icon-button {
+    width: 32px; height: 32px;
+    border: none; border-radius: 4px;
+    background: transparent; color: var(--text);
+}
+
+.custom-dialog .icon-button:hover { background: var(--hover); color: var(--text); }
+
+.custom-dialog .dialog-content {
+    padding: 0;
+    margin: 0 -8px;
+    border-top: 1px solid var(--border);
+}
+
+.custom-dialog .entry-item {
+    padding: 11px 8px;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+}
+
+.custom-dialog .entry-item:last-child { border-bottom: none; }
+.custom-dialog .entry-item:hover { background: var(--hover); }
+.custom-dialog .entry-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.custom-dialog .entry-value { margin-top: 2px; font-size: 12px; color: var(--muted); }
+
+.custom-dialog .entry-actions .icon-button {
+    width: 30px; height: 30px;
+    border: 1px solid var(--border);
+    background: var(--background);
+}
+
+.custom-dialog .entry-actions .icon-button:hover { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+
+.custom-dialog .dialog-actions {
+    padding: 0;
+    margin-top: 16px;
+    border-top: none;
+}
+
+.custom-dialog .dialog-button {
+    height: 34px;
+    padding: 0 16px;
+    font-size: 13px; font-weight: 400;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: transparent; color: var(--text);
+}
+
+.custom-dialog .dialog-button:hover { background: var(--hover); }
+.custom-dialog .dialog-button.danger { border-color: var(--danger); background: var(--danger); color: #fff; }
+.custom-dialog .dialog-button.danger:hover { opacity: 0.9; }
+.custom-dialog .empty-state { padding: 24px 8px; font-size: 12px; }
+
+/* ==========================================
+   NOTIFICATIONS: bottom-right, just above the
+   status bars, and above every dialog
+========================================== */
+
+.notification-container {
+    right: 16px;
+    bottom: 80px;
+    z-index: 30000;
+    align-items: flex-end;
+    pointer-events: none;
+}
+
+.notification { pointer-events: auto; }
+
+/* Keep the original notification size */
+.notification {
+    min-width: 190px;
+    max-width: 300px;
+    padding: 11px 14px;
+    gap: 9px;
+    border-radius: 7px;
+    font-size: 11px;
+}
+
+.notification .material-symbols-rounded { font-size: 17px; }
+
+@media (max-width: 700px) {
+    .notification-container { bottom: 76px; }
+}
+
+/* Sit directly above the footer, whatever its height is (set by notepad.js) */
+.notification-container,
+.notification-container:is(*) {
+    bottom: calc(var(--footer-offset, 64px) + 10px);
+}
+
+@media (max-width: 700px) {
+    .notification-container { bottom: calc(var(--footer-offset, 64px) + 10px); }
+}
+
+/* ==========================================
+   LINKS: one line, long values end with "..."
+   (the saved value itself is not changed)
+========================================== */
+
+.custom-dialog .entry-details { flex: 1 1 auto; min-width: 0; }
+
+.custom-dialog .entry-title,
+.custom-dialog .entry-value {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.custom-dialog .entry-actions { flex: 0 0 auto; }
+
+/* ----- Copy succeeded ----- */
+
+.custom-dialog .entry-actions .icon-button.copied,
+.template-entry-button.copied {
+    border-color: var(--success);
+    color: var(--success);
+}
+
+.custom-dialog .entry-actions .icon-button.copied:hover { background: transparent; border-color: var(--success); color: var(--success); }

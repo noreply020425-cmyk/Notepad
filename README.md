@@ -2,7 +2,7 @@
 
 ```
 /                 <- frontend (GitHub Pages)  index.html, notepad.html, config.js, plan.js ...
-/server           <- API (Render / Railway)   server.js, package.json
+/server           <- API (Vercel)             server.js, api/, vercel.json
 ```
 
 GitHub Pages can only host static files, so the API (accounts, plan, Stripe) runs separately.
@@ -19,16 +19,21 @@ Collections (`users`, `payments`) and indexes are created automatically.
 2. Settings > Payment methods: enable the methods you want. Checkout shows whatever is enabled.
    GCash is a Stripe payment method but may need to be enabled for your account first. Without it, only cards show.
 3. After deploying the API (step 3), Developers > Webhooks > Add endpoint:
-   - URL: `https://YOUR-API.onrender.com/api/billing/webhook`
+   - URL: `https://YOUR-PROJECT.vercel.app/api/billing/webhook`
    - Events: `checkout.session.completed` and `checkout.session.async_payment_succeeded`
    - Copy the signing secret into `STRIPE_WEBHOOK_SECRET`.
 
-## 3. Deploy the API (Render example)
-1. Push this repo to GitHub. On Render: New > Web Service > pick the repo.
-2. Root Directory: `server`. Build: `npm install`. Start: `npm start`.
-3. Add the environment variables from `server/.env.example`.
-   `FRONTEND_ORIGIN` must be your Pages origin, e.g. `https://yourname.github.io` (no path).
-4. Open `https://YOUR-API.onrender.com/api/health`. It should return `{"ok":true}`.
+## 3. Deploy the API (Vercel)
+1. Push this repo to GitHub, then at vercel.com: Add New > Project > import the repo.
+2. Root Directory: `server`. Framework Preset: Other. Leave build settings empty.
+3. Environment Variables: add everything from `server/.env.example`.
+   `FRONTEND_ORIGIN` must be your Pages origin (no path), e.g. `https://noreply020425-cmyk.github.io`.
+4. Deploy. Open `https://YOUR-PROJECT.vercel.app/api/health`. It should return `{"ok":true}`.
+5. If it shows a Vercel login page instead, go to Project Settings > Deployment Protection and turn off Vercel Authentication for production.
+6. Atlas > Network Access: allow `0.0.0.0/0` (Vercel has no fixed IP).
+7. After changing environment variables, redeploy so they take effect.
+
+(`server/` also still runs on Render or locally with `npm start`.)
 
 ## 4. Frontend on GitHub Pages
 1. Edit `config.js`: set `window.NOTEPAD_API` to your API URL.
@@ -52,4 +57,4 @@ Test card: 4242 4242 4242 4242.
 ## Good to know
 - Premium gating on the frontend hides features in the browser. Because notes are stored in localStorage, a technical user could bypass it. Real enforcement needs notes stored on the server.
 - Credentials edited in Settings change only this browser; the account profile on the server is set at sign-up.
-- Free Render services sleep when idle, so the first request after a pause can take about 30 seconds.
+- Vercel functions start on demand, so the first request after a quiet period can take a second or two.
